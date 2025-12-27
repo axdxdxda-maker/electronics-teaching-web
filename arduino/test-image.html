@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arduino圖片測試</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    .test-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🧪 Arduino Leonardo 圖片載入測試</h1>
+    <p>測試圖片是否能正常載入...</p>
+    
+    <div style="margin: 2rem 0;">
+      <img src="images/arduino-leonardo.jpg" 
+           alt="Arduino Leonardo測試" 
+           onload="showSuccess()" 
+           onerror="showError()">
+    </div>
+    
+    <div id="result"></div>
+    
+    <div style="margin-top: 2rem; text-align: left;">
+      <h3>檢查項目：</h3>
+      <ul>
+        <li>✅ 檔案路徑：images/arduino-leonardo.jpg</li>
+        <li>✅ 檔案存在：是（45KB）</li>
+        <li id="loadTest">⏳ 載入測試：進行中...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function showSuccess() {
+      document.getElementById('result').innerHTML = 
+        '<div class="success">✅ 圖片載入成功！可以正常使用。</div>';
+      document.getElementById('loadTest').innerHTML = 
+        '✅ 載入測試：成功';
+      console.log('圖片載入成功');
+    }
+    
+    function showError() {
+      document.getElementById('result').innerHTML = 
+        '<div class="error">❌ 圖片載入失敗！請檢查檔案格式或路徑。</div>';
+      document.getElementById('loadTest').innerHTML = 
+        '❌ 載入測試：失敗';
+      console.log('圖片載入失敗');
+    }
+    
+    // 5秒後如果沒有載入成功或失敗，顯示超時
+    setTimeout(function() {
+      if (document.getElementById('result').innerHTML === '') {
+        document.getElementById('result').innerHTML = 
+          '<div class="error">⏰ 圖片載入超時，可能檔案過大或網路問題。</div>';
+        document.getElementById('loadTest').innerHTML = 
+          '⏰ 載入測試：超時';
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

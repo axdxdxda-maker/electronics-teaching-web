@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>電阻 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+      --muted:#6b7280;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.2rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1000px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border);margin-bottom:20px}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600;text-align:center}
+    .note{font-size:14px;color:#666;margin-bottom:16px}
+
+    /* Layout */
+    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    @media (max-width: 768px){.main-grid{grid-template-columns:1fr}}
+
+    /* Resistor type toggle */
+    .type-toggle{display:flex;gap:8px;margin-bottom:20px;justify-content:center}
+    .type-btn{padding:8px 16px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;transition:all .2s ease}
+    .type-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    /* Color band selectors */
+    .band-controls{display:grid;gap:16px;margin-bottom:20px}
+    .band-group{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
+    .band-label{font-size:13px;font-weight:600;color:var(--text)}
+    
+    .color-select{position:relative;min-width:200px}
+    .select-display{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;min-height:36px;position:relative}
+    .color-preview{width:20px;height:20px;border-radius:3px;border:1px solid #999}
+    .select-text{flex:1;font-size:13px}
+    .select-value{position:absolute;right:30px;color:#fff;padding:2px 6px;border-radius:3px;font-size:12px;font-weight:600;min-width:16px;text-align:center;border:1px solid #fff}
+    .select-arrow{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid #666}
+    
+    .dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-top:none;border-radius:0 0 6px 6px;z-index:10;display:none;max-height:200px;overflow-y:auto}
+    .dropdown.open{display:block}
+    .dropdown-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+    .dropdown-item:hover{background:#f5f5f5}
+    .dropdown-item.selected{background:#e3f2fd}
+    
+    [data-theme="dark"] .select-display{background:#333;border-color:#555;color:#fff}
+    [data-theme="dark"] .dropdown{background:#333;border-color:#555}
+    [data-theme="dark"] .dropdown-item{color:#fff}
+    [data-theme="dark"] .dropdown-item:hover{background:#444}
+
+    /* Resistance input */
+    .resistance-input{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid #eee}
+    .resistance-field{display:flex;gap:8px;align-items:center}
+    .resistance-value{padding:8px 12px;border:1px solid #ccc;border-radius:6px;width:120px;font-size:14px}
+    .resistance-unit{padding:8px 12px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;min-width:60px;font-size:14px}
+    [data-theme="dark"] .resistance-value{background:#333;border-color:#555;color:#fff}
+    [data-theme="dark"] .resistance-unit{background:#444;border-color:#555;color:#fff}
+
+    /* Resistor display */
+    .resistor-display{text-align:center;padding:20px}
+    .resistor-container{position:relative;width:400px;margin:0 auto 50px}
+    .resistor{width:320px;height:50px;background:linear-gradient(180deg,#e8dcc6,#d4af8c);border-radius:25px;margin:0 auto;position:relative;box-shadow:0 3px 6px rgba(0,0,0,.15)}
+    .resistor::before,.resistor::after{content:'';position:absolute;top:50%;width:40px;height:3px;background:#999;z-index:1}
+    .resistor::before{left:-40px;transform:translateY(-50%)}
+    .resistor::after{right:-40px;transform:translateY(-50%)}
+    
+    .band{position:absolute;top:0;bottom:0;width:10px;border-radius:2px;transition:background-color .3s ease}
+    .band.band1{left:50px}
+    .band.band2{left:68px}
+    .band.band3{left:86px}
+    .band.band4{left:220px}
+    .band.band5{left:104px;display:none}
+    
+    .five-band .band.band3{left:104px}
+    .five-band .band.band4{left:122px}
+    .five-band .band.band5{left:240px;display:block}
+
+    .band-labels{position:absolute;top:60px;width:320px;left:50%;transform:translateX(-50%);display:flex}
+    .band-label-item{color:#fff;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;min-width:20px;text-align:center;position:absolute;white-space:nowrap;border:1px solid #fff}
+    
+    /* Four band label positions - scaled up */
+    .four-band .label-0{left:44px}
+    .four-band .label-1{left:62px}
+    .four-band .label-2{left:80px}
+    .four-band .label-3{left:214px}
+    
+    /* Five band label positions - scaled up */
+    .five-band .label-0{left:44px}
+    .five-band .label-1{left:62px}
+    .five-band .label-2{left:98px}
+    .five-band .label-3{left:116px}
+    .five-band .label-4{left:234px}
+
+    .resistor-value{font-size:18px;font-weight:600;margin-bottom:8px;margin-top:20px}
+    .resistor-tolerance{font-size:14px;color:var(--muted)}
+
+    /* Water flow simulation */
+    .water-demo{text-align:center;padding:20px}
+    .faucet-container{position:relative;width:200px;height:350px;margin:0 auto;background:linear-gradient(180deg,#f0f8ff,#e6f3ff);border-radius:12px;padding:20px;box-shadow:inset 0 0 20px rgba(0,150,255,0.1)}
+    
+    .faucet{width:80px;height:50px;background:linear-gradient(180deg,#e8e8e8,#c0c0c0,#808080);border-radius:12px 12px 25px 25px;margin:0 auto;position:relative;box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+    .faucet::before{content:'';position:absolute;top:5px;left:15px;right:15px;height:8px;background:linear-gradient(90deg,#fff,#ddd);border-radius:4px}
+    .faucet::after{content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:linear-gradient(180deg,#808080,#606060);border-radius:0 0 6px 6px;box-shadow:inset 0 -2px 4px rgba(0,0,0,0.3)}
+    
+    .water-stream{
+      position:absolute;
+      left:50%;
+      top:62px;
+      transform:translateX(-50%);
+      width:var(--stream-width,2px);
+      background:linear-gradient(180deg, 
+        rgba(77,208,225,var(--stream-opacity,0.9)) 0%,
+        rgba(2,136,209,var(--stream-opacity,0.9)) 50%,
+        rgba(1,87,155,var(--stream-opacity,0.8)) 100%);
+      border-radius:var(--stream-radius,1px);
+      height:var(--stream-height,180px);
+      opacity:var(--stream-visibility,1);
+      transition:all var(--transition-speed,0.8s) ease;
+      box-shadow:0 0 var(--glow-size,4px) rgba(77,208,225,var(--glow-opacity,0.4));
+      animation:water-flow var(--flow-animation-speed,2s) ease-in-out infinite;
+    }
+    
+    @keyframes water-flow{
+      0%, 100%{transform:translateX(-50%) scaleY(1)}
+      25%{transform:translateX(-50%) scaleY(0.98)}
+      50%{transform:translateX(-50%) scaleY(1.02)}
+      75%{transform:translateX(-50%) scaleY(0.99)}
+    }
+    
+    .water-drops{position:absolute;left:50%;top:var(--drops-top,242px);transform:translateX(-50%);width:30px;height:40px}
+    
+    .drop{
+      position:absolute;
+      width:var(--drop-size,4px);
+      height:var(--drop-size,4px);
+      background:radial-gradient(circle, #4dd0e1, #0288d1);
+      border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+      animation:drop-fall var(--drop-speed,1s) infinite ease-in;
+      opacity:var(--drop-opacity,0.8);
+      box-shadow:0 0 3px rgba(77,208,225,0.5);
+    }
+    
+    .drop:nth-child(1){animation-delay:0s;left:calc(50% - 2px)}
+    .drop:nth-child(2){animation-delay:var(--drop-delay-2,0.3s);left:50%}
+    .drop:nth-child(3){animation-delay:var(--drop-delay-3,0.6s);left:calc(50% + 2px)}
+    .drop:nth-child(4){animation-delay:var(--drop-delay-4,0.15s);left:calc(50% - 1px)}
+    .drop:nth-child(5){animation-delay:var(--drop-delay-5,0.45s);left:calc(50% + 1px)}
+    
+    @keyframes drop-fall{
+      0%{
+        top:0;
+        opacity:var(--drop-opacity,0.8);
+        transform:scale(1);
+      }
+      10%{
+        opacity:1;
+        transform:scale(1.1);
+      }
+      90%{
+        opacity:0.5;
+        transform:scale(0.8);
+      }
+      100%{
+        top:var(--drop-distance,50px);
+        opacity:0;
+        transform:scale(0.5);
+      }
+    }
+    
+    .water-splash{
+      position:absolute;
+      left:50%;
+      top:var(--splash-top,290px);
+      transform:translateX(-50%);
+      width:20px;
+      height:8px;
+      background:radial-gradient(ellipse, rgba(77,208,225,0.6), transparent);
+      border-radius:50%;
+      animation:splash var(--splash-speed,2s) ease-in-out infinite;
+      opacity:var(--splash-opacity,0.4);
+    }
+    
+    @keyframes splash{
+      0%, 90%, 100%{transform:translateX(-50%) scale(0.5);opacity:0}
+      5%, 15%{transform:translateX(-50%) scale(1.5);opacity:var(--splash-opacity,0.4)}
+      10%{transform:translateX(-50%) scale(2);opacity:0.6}
+    }
+
+    .flow-info{margin-top:20px;font-size:14px;color:var(--muted);font-weight:500}
+    .flow-meter{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top:8px;
+    }
+    .flow-bar{
+      width:100px;
+      height:8px;
+      background:#eee;
+      border-radius:4px;
+      overflow:hidden;
+      position:relative;
+    }
+    .flow-progress{
+      height:100%;
+      background:linear-gradient(90deg,#ff4444,#ffaa00,#44ff44);
+      border-radius:4px;
+      width:var(--flow-percentage,50%);
+      transition:width 0.8s ease;
+    }
+
+    /* Color definitions */
+    .color-black{background:#000000}
+    .color-brown{background:#8b4513}
+    .color-red{background:#ff0000}
+    .color-orange{background:#ff8000}
+    .color-yellow{background:#ffff00}
+    .color-green{background:#00ff00}
+    .color-blue{background:#0000ff}
+    .color-violet{background:#8000ff}
+    .color-grey{background:#808080}
+    .color-white{background:#ffffff}
+    .color-gold{background:#ffd700}
+    .color-silver{background:#c0c0c0}
+
+    .legend{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>電阻 🧱</h1>
+    <p>電流的阻擋者 - 控制電流大小！</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="note">說明：電阻就像水管的粗細，會限制電流大小。透過色碼環可以讀出電阻值，電阻越大，電流越小。</div>
+
+      <div class="type-toggle">
+        <div class="type-btn active" data-type="4">四環電阻</div>
+        <div class="type-btn" data-type="5">五環電阻</div>
+      </div>
+
+      <div class="main-grid">
+        <div>
+          <h3>電阻參數</h3>
+          <div class="band-controls" id="bandControls">
+            <!-- Dynamic content -->
+          </div>
+          
+          <div class="resistance-input">
+            <div class="band-label">電阻值：</div>
+            <div class="resistance-field">
+              <input type="number" class="resistance-value" id="resistanceInput" placeholder="輸入數值">
+              <select class="resistance-unit" id="resistanceUnit">
+                <option value="1">Ω</option>
+                <option value="1000" selected>kΩ</option>
+                <option value="1000000">MΩ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>電阻外觀</h3>
+          <div class="resistor-display">
+            <div class="resistor-container">
+              <div class="resistor" id="resistor">
+                <div class="band band1" id="band1"></div>
+                <div class="band band2" id="band2"></div>
+                <div class="band band3" id="band3"></div>
+                <div class="band band4" id="band4"></div>
+                <div class="band band5" id="band5"></div>
+              </div>
+              <div class="band-labels" id="bandLabels">
+                <!-- Dynamic labels will be inserted here -->
+              </div>
+            </div>
+            <div class="resistor-value" id="resistorValue">1.0 kΩ</div>
+            <div class="resistor-tolerance" id="resistorTolerance">±5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>水流模擬</h3>
+      <div class="water-demo">
+        <div class="faucet-container">
+          <div class="faucet"></div>
+          <div class="water-stream" id="waterStream"></div>
+          <div class="water-drops" id="waterDrops">
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+          </div>
+          <div class="water-splash" id="waterSplash"></div>
+        </div>
+        <div class="flow-info" id="flowInfo">電阻: 21k Ω | 水流強度: 中等</div>
+        <div class="flow-meter">
+          <span style="font-size:12px;">流量</span>
+          <div class="flow-bar">
+            <div class="flow-progress" id="flowProgress"></div>
+          </div>
+          <span style="font-size:12px;" id="flowPercent">50%</span>
+        </div>
+      </div>
+      <div class="legend">電阻越大，水流越細；電阻越小，水流越粗。模擬電流與電阻的反比關係。</div>
+    </div>
+  </div>
+
+  <script>
+
+    // Resistor calculator
+    (function(){
+      const typeToggle = document.querySelectorAll('.type-btn');
+      const bandControls = document.getElementById('bandControls');
+      const resistor = document.getElementById('resistor');
+      const bandLabels = document.getElementById('bandLabels');
+      const resistorValue = document.getElementById('resistorValue');
+      const resistorTolerance = document.getElementById('resistorTolerance');
+      const resistanceInput = document.getElementById('resistanceInput');
+      const resistanceUnit = document.getElementById('resistanceUnit');
+      const waterStream = document.getElementById('waterStream');
+      const waterDrops = document.getElementById('waterDrops');
+      const waterSplash = document.getElementById('waterSplash');
+      const flowInfo = document.getElementById('flowInfo');
+      const flowProgress = document.getElementById('flowProgress');
+      const flowPercent = document.getElementById('flowPercent');
+
+      let currentType = 4;
+      let bandValues = [2, 1, 3, 10]; // Default: 21k ohm, 5%
+      let isUpdatingFromInput = false;
+
+      const colors = {
+        0: {name: '黑', color: '#000000', class: 'color-black'},
+        1: {name: '棕', color: '#8b4513', class: 'color-brown'},
+        2: {name: '紅', color: '#ff0000', class: 'color-red'},
+        3: {name: '橙', color: '#ff8000', class: 'color-orange'},
+        4: {name: '黃', color: '#ffff00', class: 'color-yellow'},
+        5: {name: '綠', color: '#00ff00', class: 'color-green'},
+        6: {name: '藍', color: '#0000ff', class: 'color-blue'},
+        7: {name: '紫', color: '#8000ff', class: 'color-violet'},
+        8: {name: '灰', color: '#808080', class: 'color-grey'},
+        9: {name: '白', color: '#ffffff', class: 'color-white'},
+        10: {name: '金', color: '#ffd700', class: 'color-gold'}, // 0.1 multiplier, 5% tolerance
+        11: {name: '銀', color: '#c0c0c0', class: 'color-silver'} // 0.01 multiplier, 10% tolerance
+      };
+
+      const toleranceColors = {
+        1: {name: '棕', value: 1, color: '#8b4513'},
+        2: {name: '紅', value: 2, color: '#ff0000'},
+        5: {name: '綠', value: 0.5, color: '#00ff00'},
+        6: {name: '藍', value: 0.25, color: '#0000ff'},
+        7: {name: '紫', value: 0.1, color: '#8000ff'},
+        10: {name: '金', value: 5, color: '#ffd700'},
+        11: {name: '銀', value: 10, color: '#c0c0c0'}
+      };
+
+      function updateBandLabels() {
+        bandLabels.innerHTML = '';
+        const containerClass = currentType === 4 ? 'four-band' : 'five-band';
+        bandLabels.className = `band-labels ${containerClass}`;
+        
+        if (currentType === 4) {
+          // 四環電阻標籤
+          const labels = [
+            {value: bandValues[0], type: 'digit', index: 0},
+            {value: bandValues[1], type: 'digit', index: 1},
+            {value: bandValues[2] <= 9 ? `×1k` : (bandValues[2] === 10 ? '×0.1' : '×0.01'), type: 'multiplier', index: 2},
+            {value: `±${toleranceColors[bandValues[3]]?.value || 5}%`, type: 'tolerance', index: 3}
+          ];
+          
+          // Fix multiplier display
+          if (bandValues[2] <= 9) {
+            labels[2].value = bandValues[2] === 0 ? '×1' : 
+                            bandValues[2] === 1 ? '×10' : 
+                            bandValues[2] === 2 ? '×100' :
+                            bandValues[2] === 3 ? '×1k' : 
+                            bandValues[2] === 4 ? '×10k' :
+                            bandValues[2] === 5 ? '×100k' :
+                            bandValues[2] === 6 ? '×1M' : `×10${bandValues[2]}`;
+          }
+          
+          labels.forEach(label => {
+            const span = document.createElement('span');
+            span.className = `band-label-item ${label.type} label-${label.index}`;
+            span.textContent = label.value;
+            
+            // Set background color to match the band color
+            const colorKey = bandValues[label.index];
+            const isToleranceBand = label.type === 'tolerance';
+            const color = isToleranceBand ? toleranceColors[colorKey] : colors[colorKey];
+            if (color) {
+              span.style.backgroundColor = color.color;
+              // Adjust text color for better contrast
+              if (color.color === '#ffff00' || color.color === '#ffffff' || color.color === '#ffd700' || color.color === '#c0c0c0') {
+                span.style.color = '#000';
+                span.style.borderColor = '#000';
+              }
+            }
+            
+            bandLabels.appendChild(span);
+          });
+        } else {
+          // 五環電阻標籤
+          const labels = [
+            {value: bandValues[0], type: 'digit', index: 0},
+            {value: bandValues[1], type: 'digit', index: 1},
+            {value: bandValues[2], type: 'digit', index: 2},
+            {value: bandValues[3] <= 9 ? `×1k` : (bandValues[3] === 10 ? '×0.1' : '×0.01'), type: 'multiplier', index: 3},
+            {value: `±${toleranceColors[bandValues[4]]?.value || 1}%`, type: 'tolerance', index: 4}
+          ];
+          
+          // Fix multiplier display
+          if (bandValues[3] <= 9) {
+            labels[3].value = bandValues[3] === 0 ? '×1' : 
+                            bandValues[3] === 1 ? '×10' : 
+                            bandValues[3] === 2 ? '×100' :
+                            bandValues[3] === 3 ? '×1k' : 
+                            bandValues[3] === 4 ? '×10k' :
+                            bandValues[3] === 5 ? '×100k' :
+                            bandValues[3] === 6 ? '×1M' : `×10${bandValues[3]}`;
+          }
+          
+          labels.forEach(label => {
+            const span = document.createElement('span');
+            span.className = `band-label-item ${label.type} label-${label.index}`;
+            span.textContent = label.value;
+            
+            // Set background color to match the band color
+            const colorKey = bandValues[label.index];
+            const isToleranceBand = label.type === 'tolerance';
+            const color = isToleranceBand ? toleranceColors[colorKey] : colors[colorKey];
+            if (color) {
+              span.style.backgroundColor = color.color;
+              // Adjust text color for better contrast
+              if (color.color === '#ffff00' || color.color === '#ffffff' || color.color === '#ffd700' || color.color === '#c0c0c0') {
+                span.style.color = '#000';
+                span.style.borderColor = '#000';
+              }
+            }
+            
+            bandLabels.appendChild(span);
+          });
+        }
+      }
+
+      function buildBandControls() {
+        bandControls.innerHTML = '';
+        
+        if (currentType === 4) {
+          // 4-band resistor
+          addBandDropdown('第一環的顏色', 0, [1,2,3,4,5,6,7,8,9]);
+          addBandDropdown('第二環的顏色', 1, [0,1,2,3,4,5,6,7,8,9]);
+          addBandDropdown('乘數', 2, [0,1,2,3,4,5,6,10,11]);
+          addBandDropdown('容差', 3, [1,2,10,11], true);
+        } else {
+          // 5-band resistor
+          addBandDropdown('第一環的顏色', 0, [1,2,3,4,5,6,7,8,9]);
+          addBandDropdown('第二環的顏色', 1, [0,1,2,3,4,5,6,7,8,9]);
+          addBandDropdown('第三環的顏色', 2, [0,1,2,3,4,5,6,7,8,9]);
+          addBandDropdown('乘數', 3, [0,1,2,3,4,5,6,10,11]);
+          addBandDropdown('容差', 4, [1,2,5,6,7,10,11], true);
+        }
+      }
+
+      function addBandDropdown(label, bandIndex, availableColors, isTolerance = false) {
+        const div = document.createElement('div');
+        div.className = 'band-group';
+        
+        const colorSelect = document.createElement('div');
+        colorSelect.className = 'color-select';
+        
+        const currentValue = bandValues[bandIndex];
+        const currentColor = isTolerance ? toleranceColors[currentValue] : colors[currentValue];
+        
+        // Create display
+        const display = document.createElement('div');
+        display.className = 'select-display';
+        
+        let displayValue = '';
+        if (isTolerance) {
+          displayValue = currentColor ? `±${currentColor.value}%` : '';
+        } else {
+          // For multiplier band, show the multiplier value
+          if (label === '乘數') {
+            if (currentValue <= 9) {
+              displayValue = currentValue === 0 ? '×1' : 
+                           currentValue === 1 ? '×10' : 
+                           currentValue === 2 ? '×100' :
+                           currentValue === 3 ? '×1k' : 
+                           currentValue === 4 ? '×10k' :
+                           currentValue === 5 ? '×100k' :
+                           currentValue === 6 ? '×1M' : `×10${currentValue}`;
+            } else {
+              displayValue = currentValue === 10 ? '×0.1' : '×0.01';
+            }
+          } else {
+            // For digit bands, show the digit
+            displayValue = currentValue.toString();
+          }
+        }
+        
+        display.innerHTML = `
+          <div class="color-preview" style="background-color: ${currentColor?.color || '#ccc'}"></div>
+          <div class="select-text">${currentColor?.name || '選擇顏色'}</div>
+          <div class="select-value" style="background-color: ${currentColor?.color || '#007acc'}">${displayValue}</div>
+          <div class="select-arrow"></div>
+        `;
+        
+        // Create dropdown
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown';
+        
+        availableColors.forEach(colorKey => {
+          const color = isTolerance ? toleranceColors[colorKey] : colors[colorKey];
+          if (!color) return;
+          
+          const item = document.createElement('div');
+          item.className = `dropdown-item ${currentValue == colorKey ? 'selected' : ''}`;
+          item.dataset.value = colorKey;
+          item.innerHTML = `
+            <div class="color-preview" style="background-color: ${color.color}; border: 1px solid #999;"></div>
+            <div>${color.name} ${isTolerance ? `(±${color.value}%)` : ''}</div>
+          `;
+          
+          item.addEventListener('click', () => {
+            bandValues[bandIndex] = parseInt(colorKey);
+            
+            // Update the display
+            const color = isTolerance ? toleranceColors[colorKey] : colors[colorKey];
+            const preview = display.querySelector('.color-preview');
+            const text = display.querySelector('.select-text');
+            const valueDisplay = display.querySelector('.select-value');
+            
+            preview.style.backgroundColor = color.color;
+            text.textContent = color.name;
+            
+            // Update value display
+            let newDisplayValue = '';
+            if (isTolerance) {
+              newDisplayValue = `±${color.value}%`;
+            } else {
+              if (label === '乘數') {
+                if (parseInt(colorKey) <= 9) {
+                  const mult = parseInt(colorKey);
+                  newDisplayValue = mult === 0 ? '×1' : 
+                                 mult === 1 ? '×10' : 
+                                 mult === 2 ? '×100' :
+                                 mult === 3 ? '×1k' : 
+                                 mult === 4 ? '×10k' :
+                                 mult === 5 ? '×100k' :
+                                 mult === 6 ? '×1M' : `×10${mult}`;
+                } else {
+                  newDisplayValue = parseInt(colorKey) === 10 ? '×0.1' : '×0.01';
+                }
+              } else {
+                newDisplayValue = colorKey.toString();
+              }
+            }
+            valueDisplay.textContent = newDisplayValue;
+            valueDisplay.style.backgroundColor = color.color;
+            
+            updateDisplay();
+            closeAllDropdowns();
+            updateResistanceInput();
+          });
+          
+          dropdown.appendChild(item);
+        });
+        
+        display.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeAllDropdowns();
+          dropdown.classList.toggle('open');
+        });
+        
+        colorSelect.appendChild(display);
+        colorSelect.appendChild(dropdown);
+        
+        div.innerHTML = `<div class="band-label">${label}</div>`;
+        div.appendChild(colorSelect);
+        bandControls.appendChild(div);
+      }
+
+      function closeAllDropdowns() {
+        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', closeAllDropdowns);
+
+      function calculateResistance() {
+        let resistance;
+        let tolerance;
+        
+        if (currentType === 4) {
+          const digit1 = bandValues[0];
+          const digit2 = bandValues[1];
+          const multiplier = bandValues[2];
+          const toleranceKey = bandValues[3];
+          
+          let multiplierValue = multiplier <= 9 ? Math.pow(10, multiplier) : 
+                               (multiplier === 10 ? 0.1 : 0.01);
+          
+          resistance = (digit1 * 10 + digit2) * multiplierValue;
+          tolerance = toleranceColors[toleranceKey]?.value || 5;
+        } else {
+          const digit1 = bandValues[0];
+          const digit2 = bandValues[1];
+          const digit3 = bandValues[2];
+          const multiplier = bandValues[3];
+          const toleranceKey = bandValues[4];
+          
+          let multiplierValue = multiplier <= 9 ? Math.pow(10, multiplier) : 
+                               (multiplier === 10 ? 0.1 : 0.01);
+          
+          resistance = (digit1 * 100 + digit2 * 10 + digit3) * multiplierValue;
+          tolerance = toleranceColors[toleranceKey]?.value || 1;
+        }
+        
+        return {resistance, tolerance};
+      }
+
+      function formatResistance(resistance) {
+        if (resistance >= 1000000) {
+          return (resistance / 1000000).toFixed(1) + ' MΩ';
+        } else if (resistance >= 1000) {
+          return (resistance / 1000).toFixed(1) + ' kΩ';
+        } else {
+          return resistance.toFixed(1) + ' Ω';
+        }
+      }
+
+      function updateDisplay() {
+        const {resistance, tolerance} = calculateResistance();
+        
+        // Update resistor appearance
+        resistor.className = currentType === 5 ? 'resistor five-band' : 'resistor';
+        
+        for (let i = 0; i < (currentType === 4 ? 4 : 5); i++) {
+          const band = document.getElementById(`band${i + 1}`);
+          const colorKey = bandValues[i];
+          const isToleranceBand = (currentType === 4 && i === 3) || (currentType === 5 && i === 4);
+          const color = isToleranceBand ? toleranceColors[colorKey] : colors[colorKey];
+          
+          if (color) {
+            band.style.backgroundColor = color.color;
+          }
+        }
+        
+        // Update text display
+        resistorValue.textContent = formatResistance(resistance);
+        resistorTolerance.textContent = `±${tolerance}%`;
+        
+        // Update band labels
+        updateBandLabels();
+        
+        // Update water flow animation
+        updateWaterFlow(resistance);
+        
+        // Update resistance input field
+        if (!isUpdatingFromInput) {
+          updateResistanceInput();
+        }
+        
+        // Update input field colors
+        updateInputFieldColors();
+      }
+
+      function updateResistanceInput() {
+        const {resistance} = calculateResistance();
+        
+        // Determine best unit
+        let value, unit;
+        if (resistance >= 1000000) {
+          value = (resistance / 1000000).toFixed(2);
+          unit = 1000000;
+          resistanceUnit.value = '1000000';
+        } else if (resistance >= 1000) {
+          value = (resistance / 1000).toFixed(2);
+          unit = 1000;
+          resistanceUnit.value = '1000';
+        } else {
+          value = resistance.toFixed(0);
+          unit = 1;
+          resistanceUnit.value = '1';
+        }
+        
+        resistanceInput.value = parseFloat(value);
+      }
+
+      function updateFromResistanceInput() {
+        const inputValue = parseFloat(resistanceInput.value);
+        const unitValue = parseInt(resistanceUnit.value);
+        
+        if (isNaN(inputValue) || inputValue <= 0) return;
+        
+        isUpdatingFromInput = true;
+        const totalResistance = inputValue * unitValue;
+        
+        // Convert resistance to band values
+        const newBandValues = resistanceToBands(totalResistance);
+        if (newBandValues) {
+          bandValues = newBandValues;
+          buildBandControls();
+          updateDisplay();
+          updateInputFieldColors();
+        }
+        
+        isUpdatingFromInput = false;
+      }
+
+      function resistanceToBands(resistance) {
+        // Find best representation
+        let digits, multiplier, tolerance;
+        
+        if (currentType === 4) {
+          // Try different multipliers to find best fit
+          for (let mult = 0; mult <= 6; mult++) {
+            const factor = Math.pow(10, mult);
+            const base = resistance / factor;
+            
+            if (base >= 10 && base < 100) {
+              const digit1 = Math.floor(base / 10);
+              const digit2 = Math.floor(base % 10);
+              
+              if (digit1 >= 1 && digit1 <= 9 && digit2 >= 0 && digit2 <= 9) {
+                return [digit1, digit2, mult, bandValues[3]]; // Keep existing tolerance
+              }
+            }
+          }
+        } else {
+          // Five band logic
+          for (let mult = 0; mult <= 6; mult++) {
+            const factor = Math.pow(10, mult);
+            const base = resistance / factor;
+            
+            if (base >= 100 && base < 1000) {
+              const digit1 = Math.floor(base / 100);
+              const digit2 = Math.floor((base % 100) / 10);
+              const digit3 = Math.floor(base % 10);
+              
+              if (digit1 >= 1 && digit1 <= 9) {
+                return [digit1, digit2, digit3, mult, bandValues[4]]; // Keep existing tolerance
+              }
+            }
+          }
+        }
+        
+        return null;
+      }
+
+      function updateInputFieldColors() {
+        // Update resistance input field color based on first digit color
+        const firstBandColor = colors[bandValues[0]];
+        if (firstBandColor) {
+          resistanceInput.style.borderColor = firstBandColor.color;
+          resistanceInput.style.borderWidth = '2px';
+          
+          // Adjust text color for better contrast
+          if (firstBandColor.color === '#ffff00' || firstBandColor.color === '#ffffff' || firstBandColor.color === '#ffd700' || firstBandColor.color === '#c0c0c0') {
+            resistanceInput.style.color = '#000';
+          } else {
+            resistanceInput.style.color = firstBandColor.color;
+          }
+        }
+      }
+
+      function updateWaterFlow(resistance) {
+        // Calculate flow based on resistance (inverse relationship)
+        // Use logarithmic scale for more realistic progression
+        const minRes = 1; // 1 ohm
+        const maxRes = 10000000; // 10M ohm
+        const logMin = Math.log10(minRes);
+        const logMax = Math.log10(maxRes);
+        const logCurrent = Math.log10(Math.max(resistance, minRes));
+        
+        // Invert the relationship: lower resistance = higher flow
+        const flowPercent = Math.max(5, Math.min(95, 100 - ((logCurrent - logMin) / (logMax - logMin)) * 90));
+        
+        // Calculate all animation parameters based on flow percentage
+        const streamWidth = Math.max(1, Math.min(20, flowPercent / 4)); // 1-20px
+        const streamHeight = Math.max(100, Math.min(220, 120 + flowPercent)); // Variable height
+        const streamRadius = Math.max(0.5, streamWidth / 4);
+        const streamOpacity = Math.max(0.2, Math.min(0.95, flowPercent / 100));
+        
+        // Drop parameters
+        const dropSpeed = Math.max(0.4, Math.min(1.8, 2 - flowPercent / 100)); // Faster = shorter time
+        const dropSize = Math.max(2, Math.min(8, flowPercent / 15));
+        const dropOpacity = Math.max(0.3, Math.min(0.9, flowPercent / 110));
+        
+        // Glow and visual effects
+        const glowSize = Math.max(2, Math.min(12, flowPercent / 8));
+        const glowOpacity = Math.max(0.1, Math.min(0.7, flowPercent / 150));
+        
+        // Animation speeds
+        const flowAnimationSpeed = Math.max(1, Math.min(4, 3 - flowPercent / 50)); // Slower for higher flow
+        const transitionSpeed = 0.8;
+        
+        // Splash effects
+        const splashOpacity = Math.max(0, Math.min(0.6, flowPercent / 120));
+        const splashSpeed = Math.max(1.5, Math.min(3, 2.5 - flowPercent / 100));
+        
+        // Apply all CSS variables with smooth transitions
+        waterStream.style.setProperty('--stream-width', streamWidth + 'px');
+        waterStream.style.setProperty('--stream-height', streamHeight + 'px');
+        waterStream.style.setProperty('--stream-radius', streamRadius + 'px');
+        waterStream.style.setProperty('--stream-opacity', streamOpacity);
+        waterStream.style.setProperty('--stream-visibility', flowPercent > 5 ? '1' : '0');
+        waterStream.style.setProperty('--glow-size', glowSize + 'px');
+        waterStream.style.setProperty('--glow-opacity', glowOpacity);
+        waterStream.style.setProperty('--flow-animation-speed', flowAnimationSpeed + 's');
+        waterStream.style.setProperty('--transition-speed', transitionSpeed + 's');
+        
+        // Water drops
+        const dropsTop = 62 + streamHeight;
+        waterDrops.style.setProperty('--drops-top', dropsTop + 'px');
+        waterDrops.style.setProperty('--drop-speed', dropSpeed + 's');
+        waterDrops.style.setProperty('--drop-size', dropSize + 'px');
+        waterDrops.style.setProperty('--drop-opacity', dropOpacity);
+        waterDrops.style.setProperty('--drop-distance', Math.max(30, Math.min(60, flowPercent / 2)) + 'px');
+        
+        // Stagger drop delays based on flow
+        const baseDelay = dropSpeed / 5;
+        waterDrops.style.setProperty('--drop-delay-2', (baseDelay * 1.5) + 's');
+        waterDrops.style.setProperty('--drop-delay-3', (baseDelay * 3) + 's');
+        waterDrops.style.setProperty('--drop-delay-4', (baseDelay * 0.75) + 's');
+        waterDrops.style.setProperty('--drop-delay-5', (baseDelay * 2.25) + 's');
+        
+        // Splash effects
+        const splashTop = dropsTop + 40;
+        waterSplash.style.setProperty('--splash-top', splashTop + 'px');
+        waterSplash.style.setProperty('--splash-opacity', splashOpacity);
+        waterSplash.style.setProperty('--splash-speed', splashSpeed + 's');
+        
+        // Flow progress bar
+        flowProgress.style.setProperty('--flow-percentage', flowPercent + '%');
+        document.getElementById('flowPercent').textContent = Math.round(flowPercent) + '%';
+        
+        // Update flow info with more detailed description
+        let flowIntensity, flowDescription;
+        if (flowPercent > 80) {
+          flowIntensity = '極強';
+          flowDescription = '如瀑布般的水流';
+        } else if (flowPercent > 60) {
+          flowIntensity = '強';
+          flowDescription = '粗壯的水柱';
+        } else if (flowPercent > 40) {
+          flowIntensity = '中等';
+          flowDescription = '穩定的水流';
+        } else if (flowPercent > 20) {
+          flowIntensity = '弱';
+          flowDescription = '細小的水流';
+        } else {
+          flowIntensity = '微弱';
+          flowDescription = '滴水狀態';
+        }
+        
+        flowInfo.textContent = `電阻: ${formatResistance(resistance)} | 水流: ${flowIntensity} (${flowDescription})`;
+      }
+
+      // Event listeners
+      typeToggle.forEach(btn => {
+        btn.addEventListener('click', () => {
+          typeToggle.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentType = parseInt(btn.dataset.type);
+          
+          // Reset band values for new type
+          if (currentType === 4) {
+            bandValues = [1, 0, 2, 1]; // 1k ohm, 5%
+          } else {
+            bandValues = [1, 0, 0, 2, 1]; // 1k ohm, 1%
+          }
+          
+          buildBandControls();
+          updateDisplay();
+        });
+      });
+
+      // Resistance input event listeners
+      resistanceInput.addEventListener('input', updateFromResistanceInput);
+      resistanceUnit.addEventListener('change', updateFromResistanceInput);
+
+      // Initialize
+      buildBandControls();
+      updateDisplay();
+    })();
+  </script>
+</body>
+</html>

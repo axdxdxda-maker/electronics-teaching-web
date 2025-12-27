@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功課一：RGB燈控制 - 電子元件教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --red: #F44336;
+      --blue: #2196F3;
+      --green: #4CAF50;
+      --off: #9E9E9E;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .challenge-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .challenge-box h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .ai-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      border: 2px solid #10A37F;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: #10A37F;
+    }
+
+    .question-template {
+      background: #f0f9ff;
+      border: 1px solid #e0f2fe;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+    }
+
+    .code-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      white-space: pre-wrap;
+      line-height: 1.8;
+    }
+
+    .code-block .comment {
+      color: #68d391;
+    }
+
+    .code-block .keyword {
+      color: #fbb6ce;
+    }
+
+    .code-block .function {
+      color: #90cdf4;
+    }
+
+    .code-block .string {
+      color: #ffa07a;
+    }
+
+    .hint-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .success-box {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .code-section h4 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>🌈 功課一：RGB燈控制</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>🎯 第一個Arduino挑戰</h2>
+      <p>學會用按鈕控制RGB LED，體驗硬體與軟體的完美結合！</p>
+    </div>
+
+    <div class="challenge-box">
+      <h3>🎪 挑戰任務</h3>
+      <p>製作一個按鈕控制的RGB燈，每按一次按鈕，燈光會依序變換：</p>
+      <p><strong>🔴 紅色 → 🔵 藍色 → 🟢 綠色 → ⚫ 熄滅 → 🔴 紅色...</strong></p>
+    </div>
+
+    <div class="ai-section">
+      <div class="ai-header">
+        <span style="font-size: 2rem;">🤖</span>
+        <h3>與ChatGPT協作</h3>
+      </div>
+      
+      <p>你可以試著問ChatGPT這些問題來獲得幫助和完整程式碼：</p>
+      
+      <div class="question-template">
+我想用Arduino控制一個RGB LED燈，需要一個按鈕來切換顏色。
+功能需求：
+1. 按一次按鈕 → 紅色
+2. 再按一次 → 藍色  
+3. 再按一次 → 綠色
+4. 再按一次 → 熄滅
+5. 循環重複
+
+硬體接線：
+- 按鈕接在接腳2（使用內建上拉電阻）
+- 紅色LED接在接腳3
+- 藍色LED接在接腳4
+- 綠色LED接在接腳5
+
+請幫我寫Arduino程式碼，並且加上詳細的註解說明每一行在做什麼。
+      </div>
+
+      <div class="hint-box">
+        <h4>💡 提問技巧</h4>
+        <ul>
+          <li>具體描述你想要的功能行為</li>
+          <li>告訴ChatGPT你的硬體接線方式</li>
+          <li>要求程式碼加上詳細註解</li>
+          <li>如果不懂某段程式碼，可以請ChatGPT用簡單的方式解釋</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-section">
+      <h3>📝 程式碼詳細解說</h3>
+      <p>讓我們一步步了解這個程式是怎麼運作的！</p>
+      
+      <h4 style="color: var(--primary); margin-top: 2rem;">🎯 第一部分：告訴Arduino我們用了哪些接腳</h4>
+      <p>就像在房間裡貼標籤，告訴我們每個開關和燈在哪裡</p>
+      <div class="code-block">
+<span class="comment">// 腳位定義（告訴Arduino：按鈕和燈接在哪裡）</span>
+<span class="keyword">const int</span> buttonPin = 2;  <span class="comment">// 按鈕接在2號接腳</span>
+<span class="keyword">const int</span> redPin = 3;     <span class="comment">// 紅燈接在3號接腳</span>
+<span class="keyword">const int</span> bluePin = 4;    <span class="comment">// 藍燈接在4號接腳</span>
+<span class="keyword">const int</span> greenPin = 5;   <span class="comment">// 綠燈接在5號接腳</span>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">📊 第二部分：建立記憶盒子（變數）</h4>
+      <p>程式需要記住：按鈕現在按下了嗎？上一次是什麼狀態？現在要亮什麼顏色？</p>
+      <div class="code-block">
+<span class="keyword">int</span> buttonState = HIGH;        <span class="comment">// 現在按鈕的狀態（HIGH=沒按，LOW=按下）</span>
+<span class="keyword">int</span> lastButtonState = HIGH;    <span class="comment">// 上一次按鈕的狀態</span>
+<span class="keyword">int</span> ledMode = 0;               <span class="comment">// 現在要亮什麼顏色（0=全關，1=紅，2=藍，3=綠）</span>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">⚙️ 第三部分：開機設定（setup函數）</h4>
+      <p>Arduino一開機只會執行一次，用來做初始設定</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="comment">// 告訴Arduino：2號腳位是「輸入」，用來讀取按鈕</span>
+  pinMode(buttonPin, INPUT_PULLUP); <span class="comment">// INPUT_PULLUP = 使用內建上拉電阻</span>
+  
+  <span class="comment">// 告訴Arduino：3、4、5號腳位是「輸出」，用來控制LED</span>
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  
+  <span class="comment">// 一開始先把所有燈都關掉</span>
+  digitalWrite(redPin, LOW);    <span class="comment">// LOW = 關閉</span>
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+
+  <span class="comment">// 打開序列監視器，可以在電腦上看到訊息</span>
+  Serial.begin(9600);
+  Serial.println(<span class="string">"RGB Button Controller Ready!"</span>);
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🔄 第四部分：主要工作迴圈（loop函數）</h4>
+      <p>Arduino會一直重複執行這段程式，不停地檢查按鈕有沒有被按下</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="comment">// 讀取按鈕現在的狀態</span>
+  buttonState = digitalRead(buttonPin);
+
+  <span class="comment">// 偵測按鈕「從沒按 → 變成按下」的那一瞬間</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    <span class="comment">// 按鈕被按了！切換到下一個模式</span>
+    ledMode++;                    <span class="comment">// 模式加1</span>
+    <span class="keyword">if</span> (ledMode > 3) ledMode = 0; <span class="comment">// 如果超過3，就回到0（循環）</span>
+
+    <span class="comment">// 在電腦上顯示現在是哪個模式</span>
+    Serial.print(<span class="string">"Button pressed! LED mode = "</span>);
+    Serial.println(ledMode);
+
+    <span class="comment">// 根據模式決定要亮哪個燈</span>
+    <span class="keyword">switch</span> (ledMode) {
+      <span class="keyword">case</span> 1: <span class="comment">// 模式1：紅燈亮</span>
+        digitalWrite(redPin, HIGH);    <span class="comment">// HIGH = 打開</span>
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+      <span class="keyword">case</span> 2: <span class="comment">// 模式2：藍燈亮</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, HIGH);
+        <span class="keyword">break</span>;
+      <span class="keyword">case</span> 3: <span class="comment">// 模式3：綠燈亮</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, HIGH);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+      <span class="keyword">default</span>: <span class="comment">// 模式0：全部關掉</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+    }
+
+    <span class="comment">// 等待200毫秒，防止按鈕彈跳造成誤判</span>
+    delay(200);
+  }
+
+  <span class="comment">// 記住這次的按鈕狀態，下次用來比較</span>
+  lastButtonState = buttonState;
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🧠 程式運作原理（用故事來理解）</h4>
+      <div class="hint-box">
+        <p><strong>想像你在玩一個遊戲：</strong></p>
+        <ol>
+          <li>🎮 <strong>遊戲規則</strong>：每按一次按鈕，燈會換一個顏色</li>
+          <li>📝 <strong>記分板</strong>：用 ledMode 記住現在是第幾種顏色（0、1、2、3）</li>
+          <li>👀 <strong>偵測動作</strong>：程式一直看著按鈕，發現「從沒按變成按下」時才動作</li>
+          <li>➕ <strong>計數器</strong>：按一次就讓 ledMode 加1，超過3就回到0</li>
+          <li>💡 <strong>開關燈</strong>：根據 ledMode 的數字決定要亮哪個燈</li>
+        </ol>
+        <p><strong>為什麼要記住「上一次的狀態」？</strong><br>
+        就像看電影，我們要知道「上一幕」和「這一幕」的差異，才知道劇情有沒有變化。程式也是一樣，要比較「上次按鈕狀態」和「這次按鈕狀態」，才知道按鈕有沒有被按下！</p>
+    </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">📋 完整程式碼</h4>
+      <details>
+        <summary style="cursor: pointer; font-weight: bold; color: var(--primary); background: var(--background); padding: 1rem; border-radius: 5px;">點擊展開完整程式碼</summary>
+        
+        <div class="code-block" style="margin-top: 1rem;">
+<span class="comment">// 腳位定義</span>
+<span class="keyword">const int</span> buttonPin = 2;  <span class="comment">// 按鈕</span>
+<span class="keyword">const int</span> redPin = 3;
+<span class="keyword">const int</span> bluePin = 4;
+<span class="keyword">const int</span> greenPin = 5;
+
+<span class="keyword">int</span> buttonState = HIGH;        <span class="comment">// 現在的按鈕狀態</span>
+<span class="keyword">int</span> lastButtonState = HIGH;    <span class="comment">// 上一次的按鈕狀態</span>
+<span class="keyword">int</span> ledMode = 0;               <span class="comment">// 紀錄現在亮的顏色模式（0~3）</span>
+
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  pinMode(buttonPin, INPUT_PULLUP); <span class="comment">// 使用內建上拉電阻</span>
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  
+  <span class="comment">// 全部先關燈</span>
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+
+  Serial.begin(9600);
+  Serial.println(<span class="string">"RGB Button Controller Ready!"</span>);
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  buttonState = digitalRead(buttonPin);
+
+  <span class="comment">// 偵測從「未按下 → 按下」的瞬間</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    ledMode++;
+    <span class="keyword">if</span> (ledMode > 3) ledMode = 0; <span class="comment">// 循環</span>
+
+    Serial.print(<span class="string">"Button pressed! LED mode = "</span>);
+    Serial.println(ledMode);
+
+    <span class="comment">// 根據模式亮燈</span>
+    <span class="keyword">switch</span> (ledMode) {
+      <span class="keyword">case</span> 1: <span class="comment">// 紅</span>
+        digitalWrite(redPin, HIGH);
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+      <span class="keyword">case</span> 2: <span class="comment">// 藍</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, HIGH);
+        <span class="keyword">break</span>;
+      <span class="keyword">case</span> 3: <span class="comment">// 綠</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, HIGH);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+      <span class="keyword">default</span>: <span class="comment">// 全關</span>
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, LOW);
+        digitalWrite(bluePin, LOW);
+        <span class="keyword">break</span>;
+    }
+    
+    delay(200); <span class="comment">// 防止按鈕彈跳（debounce）</span>
+  }
+
+  lastButtonState = buttonState;
+}
+        </div>
+      </details>
+    </div>
+
+    <div class="success-box">
+      <h4>🎉 完成挑戰後</h4>
+      <p>恭喜你完成第一個Arduino專案！現在你學會了：</p>
+      <ul>
+        <li>✅ 如何定義和使用Arduino接腳</li>
+        <li>✅ 如何用變數記住狀態</li>
+        <li>✅ 如何偵測按鈕按下的瞬間</li>
+        <li>✅ 如何用switch語句控制不同的LED</li>
+        <li>✅ 如何與ChatGPT協作解決問題</li>
+      </ul>
+      <p><strong>🚀 挑戰延伸：</strong></p>
+      <ul>
+        <li>試著詢問ChatGPT如何讓LED閃爍</li>
+        <li>問問看如何增加更多顏色組合（紫色、黃色、白色）</li>
+        <li>請ChatGPT幫你加入「長按按鈕關閉所有燈」的功能</li>
+      </ul>
+    </div>
+
+    <div class="navigation">
+      <a href="chatgpt-guide.html" class="nav-btn">⬅️ 上一步：ChatGPT協作</a>
+      <a href="project2-segment.html" class="nav-btn">下一個功課：數碼管倒數 ➡️</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>危險的短路 - 基礎電路教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --danger: #F44336;
+      --warning: #FF9800;
+      --safe: #4CAF50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .danger-alert {
+      background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      text-align: center;
+      border: 3px solid var(--danger);
+    }
+
+    .short-circuit-demo {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .circuit-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .normal-circuit {
+      background: #e8f5e8;
+      border: 3px solid var(--safe);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .short-circuit {
+      background: #ffebee;
+      border: 3px solid var(--danger);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .circuit-diagram {
+      font-size: 1.5rem;
+      line-height: 2;
+      margin: 1rem 0;
+      font-family: monospace;
+    }
+
+    /* SVG schematic styles (fixed coordinates) */
+    .schematic { width: 100%; max-width: 520px; display: block; margin: 0 auto; }
+    .wire { stroke: #2b2d42; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .battery-icon { font: 500 24px/1 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji', sans-serif; fill: #455A64; }
+    .label { font: 500 14px/1 sans-serif; fill: #455A64; }
+    .lamp-bulb { fill: #B0BEC5; stroke: #607D8B; stroke-width: 2; }
+    .lamp-bulb.on { fill: #FFD54F; }
+
+    .safety-tips {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .tip-card {
+      background: var(--background);
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      border-top: 4px solid;
+    }
+
+    .tip-card.do {
+      border-top-color: var(--safe);
+    }
+
+    .tip-card.dont {
+      border-top-color: var(--danger);
+    }
+
+    .tip-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .circuit-comparison {
+        grid-template-columns: 1fr;
+      }
+      
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>⚠️ 危險的短路</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>⚡ 什麼是短路？為什麼危險？</h2>
+      <p>短路就像水管破洞一樣，會造成大麻煩！讓我們學習如何避免短路，保護自己和家人的安全。</p>
+    </div>
+
+    <div class="danger-alert">
+      <h3 style="font-size: 2rem; margin-bottom: 1rem;">🚨 重要安全警告</h3>
+      <p style="font-size: 1.2rem;">短路可能導致火災、爆炸和觸電！絕對不要故意製造短路，要時刻注意用電安全。</p>
+    </div>
+
+    <div class="short-circuit-demo">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🔍 正常電路 vs 短路</h3>
+      
+      <div class="circuit-comparison">
+        <div class="normal-circuit">
+          <h4 style="color: var(--safe);">✅ 正常電路（閉合）</h4>
+          <svg viewBox="0 0 520 220" class="schematic" aria-label="正常電路">
+            <!-- 回路矩形 -->
+            <polyline class="wire" points="60,40 460,40 460,180 60,180 60,40"/>
+            <!-- 電池 Icon 與極性文字 -->
+            <text x="40" y="96" class="battery-icon">🔋</text>
+            <text x="100" y="58" class="label">正極</text>
+            <text x="100" y="176" class="label">負極</text>
+            <!-- 燈泡（點亮） -->
+            <circle cx="460" cy="110" r="18" class="lamp-bulb on"/>
+            <!-- 與上下導線連接 -->
+            <line x1="460" y1="40" x2="460" y2="92" class="wire"/>
+            <line x1="460" y1="128" x2="460" y2="180" class="wire"/>
+          </svg>
+          <p><strong>電流路徑：</strong><br>電池 → 電線 → 燈泡 → 電線 → 電池</p>
+          <p><strong>結果：</strong>燈泡正常發光 💡</p>
+        </div>
+
+        <div class="short-circuit">
+          <h4 style="color: var(--danger);">❌ 短路電路（直接短接）</h4>
+          <svg viewBox="0 0 520 220" class="schematic" aria-label="短路電路">
+            <!-- 回路矩形 -->
+            <polyline class="wire" points="60,40 460,40 460,180 60,180 60,40"/>
+            <!-- 電池 Icon 與極性文字（加大） -->
+            <text x="36" y="96" class="battery-icon">🔋</text>
+            <text x="100" y="58" class="label">正極</text>
+            <text x="100" y="176" class="label">負極</text>
+            <!-- 燈泡（在右側，未發光） -->
+            <circle cx="460" cy="110" r="18" class="lamp-bulb"/>
+            <line x1="460" y1="40" x2="460" y2="92" class="wire"/>
+            <line x1="460" y1="128" x2="460" y2="180" class="wire"/>
+            <!-- 清楚的短路：用粗紅線直接把正負極連起來（跨越整個左側邊） -->
+            <!-- 將短接線畫在內側，不覆蓋邊框，清楚表達「直接短路」 -->
+            <line x1="90" y1="52" x2="90" y2="168" stroke="#F44336" stroke-width="8" stroke-linecap="round"/>
+            <text x="98" y="116" class="label" fill="#F44336">短接</text>
+          </svg>
+          <p><strong>電流路徑：</strong><br>電池 → 上方短接導線 → 電池（繞過燈泡）</p>
+          <p><strong>結果：</strong>巨大電流、快速發熱，極度危險！ 🔥</p>
+        </div>
+      </div>
+
+      <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 2rem; margin-top: 2rem;">
+        <h4 style="color: #856404; text-align: center; margin-bottom: 1rem;">🤔 為什麼短路這麼危險？</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #856404;">⚡</div>
+            <p><strong>大電流：</strong>就像水壩決堤，電流一下子變得很大</p>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #856404;">🔥</div>
+            <p><strong>產生熱量：</strong>電線會變得很熱，可能燒起來</p>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #856404;">💥</div>
+            <p><strong>電池損壞：</strong>電池可能過熱、漏液或爆炸</p>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #856404;">🏠</div>
+            <p><strong>火災危險：</strong>可能引起火災，燒毀房屋</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="safety-tips">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🛡️ 用電安全守則</h3>
+      
+      <div class="tips-grid">
+        <div class="tip-card do">
+          <div class="tip-icon">✅</div>
+          <h4 style="color: var(--safe);">正確做法</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>使用合格的電器設備</li>
+            <li>定期檢查電線是否破損</li>
+            <li>濕手不碰電器開關</li>
+            <li>使用護套保護插座</li>
+          </ul>
+        </div>
+
+        <div class="tip-card dont">
+          <div class="tip-icon">❌</div>
+          <h4 style="color: var(--danger);">危險行為</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>絕不用鐵絲代替保險絲</li>
+            <li>不要同時插太多電器</li>
+            <li>不要拉扯電線</li>
+            <li>不要在電線上掛東西</li>
+          </ul>
+        </div>
+
+        <div class="tip-card do">
+          <div class="tip-icon">🔧</div>
+          <h4 style="color: var(--safe);">保護裝置</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>斷路器：電流太大時自動切斷</li>
+            <li>保險絲：過載時熔斷保護</li>
+            <li>漏電斷路器：防止觸電</li>
+            <li>避雷針：保護建築物</li>
+          </ul>
+        </div>
+
+        <div class="tip-card dont">
+          <div class="tip-icon">🚨</div>
+          <h4 style="color: var(--danger);">緊急處理</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>發現電線冒煙：立刻關閉電源</li>
+            <li>有人觸電：先切斷電源再救人</li>
+            <li>電器起火：用乾粉滅火器</li>
+            <li>停電檢修：找專業電工</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; padding: 2rem; margin: 2rem 0;">
+      <h3 style="text-align: center; margin-bottom: 2rem;">🏠 家庭用電安全檢查表</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔌</div>
+          <h4>插座檢查</h4>
+          <p>• 插座有無鬆動<br>• 插頭是否完整<br>• 有無焦黑痕跡</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔗</div>
+          <h4>電線檢查</h4>
+          <p>• 外皮有無破損<br>• 接頭是否牢固<br>• 有無過度彎曲</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+          <h4>電器檢查</h4>
+          <p>• 使用時有無異常聲音<br>• 外殼是否過熱<br>• 功能是否正常</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🛡️</div>
+          <h4>保護裝置</h4>
+          <p>• 斷路器是否正常<br>• 漏電保護器測試<br>• 接地線檢查</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; padding: 2rem; margin: 2rem 0; text-align: center;">
+      <h3 style="color: #155724; margin-bottom: 1rem;">🎓 記住這些安全口訣</h3>
+      <div style="font-size: 1.2rem; line-height: 2;">
+        <p><strong>「電器安全用，短路要避免」</strong></p>
+        <p><strong>「濕手不碰電，安全第一線」</strong></p>
+        <p><strong>「電線要檢查，破損快更換」</strong></p>
+        <p><strong>「保護裝置好，全家都安心」</strong></p>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="complete-circuit.html" class="nav-btn">⬅️ 上一課：完整的電路</a>
+      <a href="switch-magic.html" class="nav-btn">下一課：開關的魔法 ➡️</a>
+    </div>
+  </div>
+</body>
+</html>

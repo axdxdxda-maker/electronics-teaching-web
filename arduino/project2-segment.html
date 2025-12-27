@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功課二：數碼管倒數 - 電子元件教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --segment-on: #FF0000;
+      --segment-off: #330000;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .challenge-box {
+      background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .challenge-box h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .ai-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      border: 2px solid #10A37F;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: #10A37F;
+    }
+
+    .question-template {
+      background: #f0f9ff;
+      border: 1px solid #e0f2fe;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+    }
+
+    .code-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      white-space: pre-wrap;
+      line-height: 1.8;
+    }
+
+    .code-block .string {
+      color: #ffa07a;
+    }
+
+    .code-block .comment {
+      color: #68d391;
+    }
+
+    .code-block .keyword {
+      color: #fbb6ce;
+    }
+
+    .code-block .function {
+      color: #90cdf4;
+    }
+
+    .hint-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .success-box {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .code-section h4 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>⏱️ 功課二：數碼管倒數</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>⏰ 數碼管倒數計時器</h2>
+      <p>學會控制七段顯示器，製作一個真實的倒數計時器！</p>
+    </div>
+
+    <div class="challenge-box">
+      <h3>🎯 挑戰任務</h3>
+      <p>製作一個按鈕控制的倒數計時器，結合數碼管和RGB燈光效果：</p>
+      <p><strong>按下按鈕 → 從9開始倒數 → 9,8,7...配合燈光變化 → 0 → 全部熄滅</strong></p>
+    </div>
+
+    <div class="ai-section">
+      <div class="ai-header">
+        <span style="font-size: 2rem;">🤖</span>
+        <h3>與ChatGPT協作</h3>
+      </div>
+      
+      <p>你可以試著問ChatGPT這些問題來獲得幫助和完整程式碼：</p>
+      
+      <div class="question-template">
+我想用Arduino製作一個倒數計時器，使用TM1637四位數碼管顯示數字，
+並搭配RGB燈光效果。
+
+功能需求：
+1. 按下按鈕開始從9倒數到0
+2. 倒數時顯示器顯示數字
+3. 根據倒數數字顯示不同顏色燈光：
+   - 9~7：紅燈
+   - 6~4：藍燈  
+   - 3~0：綠燈
+4. 倒數結束後全部關閉
+
+硬體接線：
+- 按鈕接在接腳2
+- 紅色LED接在接腳3
+- 藍色LED接在接腳4
+- 綠色LED接在接腳5
+- TM1637的DIO接在接腳6
+- TM1637的CLK接在接腳7
+
+請幫我寫Arduino程式碼，並且加上詳細的註解說明。
+      </div>
+
+      <div class="hint-box">
+        <h4>💡 提問技巧</h4>
+        <ul>
+          <li>說明你使用的硬體模組（TM1637數碼管）</li>
+          <li>告訴ChatGPT需要安裝什麼函式庫</li>
+          <li>描述清楚燈光變化的規則</li>
+          <li>如果不懂某個函式，可以請ChatGPT詳細解釋</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-section">
+      <h3>📝 程式碼詳細解說</h3>
+      <p>讓我們一步步了解這個倒數計時器是怎麼運作的！</p>
+      
+      <h4 style="color: var(--primary); margin-top: 2rem;">📚 第一部分：引入函式庫</h4>
+      <p>TM1637是控制四位數碼管的特殊晶片，我們需要它的專用函式庫</p>
+      <div class="code-block">
+<span class="keyword">#include</span> <span class="string">&lt;TM1637Display.h&gt;</span>  <span class="comment">// 引入TM1637數碼管控制函式庫</span>
+        </div>
+      <div class="hint-box">
+        <p>💡 <strong>什麼是函式庫？</strong><br>
+        就像玩具的「說明書」，裡面有很多已經寫好的指令，讓我們可以輕鬆控制數碼管，不用自己從頭寫複雜的程式。</p>
+        <p><strong>如何安裝？</strong><br>
+        在Arduino IDE中，點選「草稿碼」→「匯入程式庫」→「管理程式庫」，搜尋「TM1637」並安裝。</p>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🎯 第二部分：腳位定義</h4>
+      <p>告訴Arduino每個元件接在哪個接腳上</p>
+      <div class="code-block">
+<span class="comment">// --- 腳位定義 ---</span>
+<span class="keyword">const int</span> buttonPin = 2;  <span class="comment">// 按鈕接在2號接腳</span>
+<span class="keyword">const int</span> redPin = 3;     <span class="comment">// 紅燈接在3號接腳</span>
+<span class="keyword">const int</span> bluePin = 4;    <span class="comment">// 藍燈接在4號接腳</span>
+<span class="keyword">const int</span> greenPin = 5;   <span class="comment">// 綠燈接在5號接腳</span>
+<span class="keyword">const int</span> DIO = 6;        <span class="comment">// 數碼管的資料線（DIO）接在6號接腳</span>
+<span class="keyword">const int</span> CLK = 7;        <span class="comment">// 數碼管的時鐘線（CLK）接在7號接腳</span>
+              </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🎨 第三部分：建立數碼管物件</h4>
+      <p>創建一個「數碼管控制器」，就像遙控器一樣可以控制顯示器</p>
+      <div class="code-block">
+<span class="comment">// --- 物件建立 ---</span>
+TM1637Display display(CLK, DIO);  <span class="comment">// 建立數碼管控制物件</span>
+              </div>
+      <div class="hint-box">
+        <p>💡 <strong>什麼是「物件」？</strong><br>
+        想像你有一個萬能遙控器（display），它可以控制電視顯示什麼畫面。這裡的 display 就是用來控制數碼管要顯示什麼數字的「遙控器」。</p>
+              </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">📊 第四部分：建立變數（記憶盒子）</h4>
+      <p>程式需要記住一些資訊：按鈕狀態、是否正在倒數、現在數到幾</p>
+      <div class="code-block">
+<span class="comment">// --- 變數 ---</span>
+<span class="keyword">int</span> lastButtonState = HIGH;  <span class="comment">// 記住上一次按鈕的狀態</span>
+<span class="keyword">bool</span> counting = false;        <span class="comment">// 是否正在倒數中（true=是，false=否）</span>
+<span class="keyword">int</span> counter = 9;              <span class="comment">// 倒數計數器，從9開始</span>
+              </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">⚙️ 第五部分：setup 開機設定</h4>
+      <p>Arduino一開機時的初始設定</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="comment">// 設定接腳模式</span>
+  pinMode(buttonPin, INPUT_PULLUP);  <span class="comment">// 按鈕接腳設為輸入，使用內建上拉電阻</span>
+  pinMode(redPin, OUTPUT);            <span class="comment">// 紅燈接腳設為輸出</span>
+  pinMode(greenPin, OUTPUT);          <span class="comment">// 綠燈接腳設為輸出</span>
+  pinMode(bluePin, OUTPUT);           <span class="comment">// 藍燈接腳設為輸出</span>
+
+  display.setBrightness(7);  <span class="comment">// 設定數碼管亮度，0最暗，7最亮</span>
+
+  <span class="comment">// 初始化：一開始顯示0，所有燈都關閉</span>
+  display.showNumberDec(0);  <span class="comment">// 在數碼管上顯示數字0</span>
+  <span class="function">allOff</span>();                   <span class="comment">// 呼叫allOff函式，把所有燈關掉</span>
+
+  <span class="comment">// 開啟序列監視器，可以在電腦上看到訊息</span>
+  Serial.begin(9600);
+  Serial.println(<span class="string">"Ready! 按下按鈕開始倒數～"</span>);
+}
+              </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🔄 第六部分：loop 主要工作迴圈</h4>
+      <p>Arduino會不停重複執行這段程式，檢查按鈕有沒有被按下</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">int</span> buttonState = digitalRead(buttonPin);  <span class="comment">// 讀取按鈕現在的狀態</span>
+
+  <span class="comment">// 偵測按鈕按下（由HIGH變LOW）</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    <span class="keyword">if</span> (!counting) {  <span class="comment">// 如果沒有在倒數中</span>
+      counting = true;   <span class="comment">// 開始倒數</span>
+      counter = 9;       <span class="comment">// 從9開始</span>
+      Serial.println(<span class="string">"開始倒數！"</span>);
+      <span class="function">startCountdown</span>();  <span class="comment">// 呼叫倒數函式</span>
+    }
+  }
+
+  lastButtonState = buttonState;  <span class="comment">// 記住這次的按鈕狀態</span>
+}
+              </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">⏱️ 第七部分：倒數函式（最重要！）</h4>
+      <p>這是倒數計時的核心程式，控制數字顯示和燈光變化</p>
+      <div class="code-block">
+<span class="comment">// --- 倒數函式 ---</span>
+<span class="keyword">void</span> <span class="function">startCountdown</span>() {
+  <span class="comment">// 用for迴圈從counter倒數到0</span>
+  <span class="keyword">for</span> (<span class="keyword">int</span> i = counter; i >= 0; i--) {
+    display.showNumberDec(i, false);  <span class="comment">// 在數碼管上顯示數字i</span>
+
+    <span class="comment">// 根據數字決定要亮什麼顏色的燈</span>
+    <span class="keyword">if</span> (i > 6) {
+      <span class="function">setColor</span>(1, 0, 0);  <span class="comment">// 9,8,7 → 亮紅燈</span>
+    } <span class="keyword">else if</span> (i > 3) {
+      <span class="function">setColor</span>(0, 1, 0);  <span class="comment">// 6,5,4 → 亮藍燈</span>
+    } <span class="keyword">else if</span> (i >= 0) {
+      <span class="function">setColor</span>(0, 0, 1);  <span class="comment">// 3,2,1,0 → 亮綠燈</span>
+    }
+
+    delay(1000); <span class="comment">// 等待1000毫秒（1秒）再繼續</span>
+  }
+
+  <span class="comment">// 倒數結束後</span>
+  <span class="function">allOff</span>();              <span class="comment">// 關閉所有燈</span>
+  display.showNumberDec(0);  <span class="comment">// 顯示0</span>
+  Serial.println(<span class="string">"倒數結束！"</span>);
+  counting = false;          <span class="comment">// 標記倒數已結束</span>
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">💡 第八部分：控制燈光的函式</h4>
+      <p>這兩個函式負責控制RGB燈的開關</p>
+      <div class="code-block">
+<span class="comment">// --- 控制燈光 ---</span>
+<span class="keyword">void</span> <span class="function">setColor</span>(<span class="keyword">int</span> r, <span class="keyword">int</span> b, <span class="keyword">int</span> g) {
+  digitalWrite(redPin, r);    <span class="comment">// r=1就打開紅燈，r=0就關閉紅燈</span>
+  digitalWrite(bluePin, b);   <span class="comment">// b=1就打開藍燈，b=0就關閉藍燈</span>
+  digitalWrite(greenPin, g);  <span class="comment">// g=1就打開綠燈，g=0就關閉綠燈</span>
+}
+
+<span class="comment">// --- 全部關燈 ---</span>
+<span class="keyword">void</span> <span class="function">allOff</span>() {
+  digitalWrite(redPin, LOW);    <span class="comment">// 關閉紅燈</span>
+  digitalWrite(greenPin, LOW);  <span class="comment">// 關閉綠燈</span>
+  digitalWrite(bluePin, LOW);   <span class="comment">// 關閉藍燈</span>
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🧠 程式運作原理（用故事來理解）</h4>
+      <div class="hint-box">
+        <p><strong>想像你在玩倒數遊戲：</strong></p>
+        <ol>
+          <li>🎮 <strong>按鈕是開關</strong>：按一下就開始倒數</li>
+          <li>🔢 <strong>數碼管是計分板</strong>：顯示現在倒數到幾</li>
+          <li>🚦 <strong>RGB燈是交通號誌</strong>：
+            <ul>
+              <li>紅燈（9~7）：像紅燈停止，還有很多時間</li>
+              <li>藍燈（6~4）：中間階段，準備加速</li>
+              <li>綠燈（3~0）：綠燈通行，時間快到了！</li>
+          </ul>
+          </li>
+          <li>⏱️ <strong>delay(1000)</strong>：每秒換一個數字，就像時鐘的秒針</li>
+          <li>🔁 <strong>for迴圈</strong>：自動幫我們從9數到0，不用寫9次程式碼</li>
+        </ol>
+        <p><strong>為什麼要用函式（function）？</strong><br>
+        就像把常用的動作取個名字。例如「關燈」這個動作需要關紅、藍、綠三個燈，我們把它包成 allOff() 函式，之後只要呼叫 allOff() 就能一次關掉所有燈，很方便！</p>
+    </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">📋 完整程式碼</h4>
+      <details>
+        <summary style="cursor: pointer; font-weight: bold; color: var(--primary); background: var(--background); padding: 1rem; border-radius: 5px;">點擊展開完整程式碼</summary>
+        
+        <div class="code-block" style="margin-top: 1rem;">
+<span class="keyword">#include</span> <span class="string">&lt;TM1637Display.h&gt;</span>
+
+<span class="comment">// --- 腳位定義 ---</span>
+<span class="keyword">const int</span> buttonPin = 2;
+<span class="keyword">const int</span> redPin = 3;
+<span class="keyword">const int</span> bluePin = 4;
+<span class="keyword">const int</span> greenPin = 5;
+<span class="keyword">const int</span> DIO = 6;
+<span class="keyword">const int</span> CLK = 7;
+
+<span class="comment">// --- 物件建立 ---</span>
+TM1637Display display(CLK, DIO);
+
+<span class="comment">// --- 變數 ---</span>
+<span class="keyword">int</span> lastButtonState = HIGH;
+<span class="keyword">bool</span> counting = false;
+<span class="keyword">int</span> counter = 9;
+
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+
+  display.setBrightness(7);  <span class="comment">// 亮度0~7</span>
+  
+  <span class="comment">// 初始化</span>
+  display.showNumberDec(0);
+  <span class="function">allOff</span>();
+  
+  Serial.begin(9600);
+  Serial.println(<span class="string">"Ready! 按下按鈕開始倒數～"</span>);
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">int</span> buttonState = digitalRead(buttonPin);
+
+  <span class="comment">// 偵測按鈕按下（由HIGH變LOW）</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    <span class="keyword">if</span> (!counting) {
+      counting = true;
+      counter = 9;
+      Serial.println(<span class="string">"開始倒數！"</span>);
+      <span class="function">startCountdown</span>();
+    }
+  }
+
+  lastButtonState = buttonState;
+}
+
+<span class="comment">// --- 倒數函式 ---</span>
+<span class="keyword">void</span> <span class="function">startCountdown</span>() {
+  <span class="keyword">for</span> (<span class="keyword">int</span> i = counter; i >= 0; i--) {
+    display.showNumberDec(i, false);  <span class="comment">// 顯示數字</span>
+
+    <span class="keyword">if</span> (i > 6) {
+      <span class="function">setColor</span>(1, 0, 0);  <span class="comment">// 紅燈</span>
+    } <span class="keyword">else if</span> (i > 3) {
+      <span class="function">setColor</span>(0, 1, 0);  <span class="comment">// 藍燈</span>
+    } <span class="keyword">else if</span> (i >= 0) {
+      <span class="function">setColor</span>(0, 0, 1);  <span class="comment">// 綠燈</span>
+    }
+
+    delay(1000); <span class="comment">// 每秒倒數一次</span>
+  }
+
+  <span class="comment">// 倒數結束</span>
+  <span class="function">allOff</span>();
+  display.showNumberDec(0);
+  Serial.println(<span class="string">"倒數結束！"</span>);
+  counting = false;
+}
+
+<span class="comment">// --- 控制燈光 ---</span>
+<span class="keyword">void</span> <span class="function">setColor</span>(<span class="keyword">int</span> r, <span class="keyword">int</span> b, <span class="keyword">int</span> g) {
+  digitalWrite(redPin, r);
+  digitalWrite(bluePin, b);
+  digitalWrite(greenPin, g);
+}
+
+<span class="comment">// --- 全部關燈 ---</span>
+<span class="keyword">void</span> <span class="function">allOff</span>() {
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+}
+        </div>
+      </details>
+    </div>
+
+    <div class="success-box">
+      <h4>🎉 完成挑戰後</h4>
+      <p>恭喜你完成了進階的倒數計時器專案！現在你學會了：</p>
+      <ul>
+        <li>✅ 如何使用外部函式庫（TM1637）</li>
+        <li>✅ 如何控制數碼管顯示數字</li>
+        <li>✅ 如何用for迴圈實現倒數功能</li>
+        <li>✅ 如何根據條件改變燈光顏色</li>
+        <li>✅ 如何使用函式讓程式更簡潔</li>
+      </ul>
+      <p><strong>🚀 挑戰延伸：</strong></p>
+      <ul>
+        <li>詢問ChatGPT如何顯示兩位數（例如從99倒數到0）</li>
+        <li>問問看如何在倒數到0時加入蜂鳴器提示音</li>
+        <li>請ChatGPT幫你加入「暫停」和「繼續」的功能</li>
+        <li>試著讓LED在倒數結束時閃爍三次</li>
+      </ul>
+    </div>
+
+    <div class="navigation">
+      <a href="project1-rgb.html" class="nav-btn">⬅️ 上一個功課：RGB燈控制</a>
+      <a href="project3-buzzer.html" class="nav-btn">下一個功課：蜂鳴器控制 ➡️</a>
+    </div>
+  </div>
+</body>
+</html>

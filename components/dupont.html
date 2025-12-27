@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>杜邦線 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+      --muted:#6b7280;
+      --hole:#9ca3af;
+      --active-color:#007acc;
+      --active-border:#007acc;
+      --active-shadow:#007acc99;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.2rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1000px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border);margin-bottom:20px}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600;text-align:center}
+    .note{font-size:14px;color:#666;margin-bottom:16px}
+
+    /* Control panel */
+    .controls{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
+    .control-group{background:rgba(0,0,0,.02);padding:12px;border-radius:8px}
+    .control-title{font-weight:600;margin-bottom:8px;font-size:13px}
+    .color-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;justify-items:center}
+    .color-btn{width:28px;height:28px;border-radius:50%;border:2px solid #ccc;cursor:pointer;transition:transform .15s ease}
+    .color-btn:hover{transform:scale(1.1)}
+    .color-btn.active{border-color:#333;transform:scale(1.15);box-shadow:0 0 8px rgba(0,0,0,.3)}
+
+    /* Breadboard */
+    .main-area{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
+    .board-container{display:flex;align-items:center;gap:20px;justify-content:center}
+    .board{background:#f0f0f0;border:2px solid #ccc;border-radius:8px;padding:20px;display:grid;gap:16px;width:400px;position:relative}
+    
+    .labels{display:grid;gap:16px;align-self:stretch;justify-content:start;margin-top:20px}
+    .label-item{font-size:12px;color:var(--muted);font-weight:600;text-align:center;white-space:nowrap;display:flex;align-items:center;height:40px}
+    .label-item.top{height:40px}
+    .label-item.mid-upper{height:80px}
+    .label-item.mid-lower{height:80px}
+    .label-item.bottom{height:40px}
+    .label-separator{height:3px}
+    
+    .rail-section{display:grid;gap:4px}
+    .rails{display:grid;grid-template-columns:repeat(10, 1fr);gap:3px;justify-content:center}
+    
+    .separator{height:3px;background:#333;margin:8px 0;border-radius:2px}
+    
+    .mid-section{display:grid;gap:16px}
+    .mid-block{display:grid;grid-template-columns:repeat(10, 1fr);gap:3px;grid-template-rows:repeat(5, 1fr);justify-content:center}
+    
+    .hole{width:14px;height:14px;border-radius:50%;background:#999;border:1px solid #777;cursor:pointer;transition:all .15s ease}
+    .hole:hover{transform:scale(1.15);background:#777}
+    .hole.selected{background:var(--active-color);border-color:var(--active-border);box-shadow:0 0 8px var(--active-shadow)}
+    .hole.connected{background:#28a745;border-color:#1e7e34;box-shadow:0 0 8px rgba(40,167,69,.6)}
+    .hole.active{background:#f59e0b;border-color:#e67e22;box-shadow:0 0 8px rgba(245,158,11,.6)}
+    
+    .rail-label{font-size:11px;color:var(--muted);text-align:center;margin:2px 0;font-weight:600}
+
+    /* Wire info panel */
+    .wire-info{background:rgba(0,0,0,.05);padding:12px;border-radius:8px;font-size:13px;text-align:center;margin-bottom:12px}
+    .clear-btn{background:var(--danger);color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+    .clear-btn:hover{background:#c82333}
+
+    /* Wire SVG overlay */
+    .wire-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5}
+    .wire-line{stroke-width:3;fill:none;stroke-linecap:round}
+
+    .legend{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+
+    @media (max-width: 768px) {
+      .header h1{font-size:2rem}
+      .main-area{grid-template-columns:1fr;gap:16px}
+      .board-container{flex-direction:column;max-width:100%}
+      .board{width:100%;max-width:350px}
+      .controls{max-width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>杜邦線 🧵</h1>
+    <p>電路的延長線 - 連接任意兩點！</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="note">說明：杜邦線是電路中的「延長線」，用來連接不同的點。<strong>左鍵點擊</strong>兩個孔建立杜邦線連接，所有電氣相通的洞位會以<strong style="color:#28a745">綠色高亮</strong>顯示。<strong>右鍵點擊</strong>可查看麵包板內部連通規則（<strong style="color:#f59e0b">橙色高亮</strong>）。</div>
+
+      <div class="controls">
+        <div class="control-group">
+          <div class="control-title">選擇杜邦線顏色</div>
+          <div class="color-grid" id="colorGrid">
+            <div class="color-btn active" data-color="#ff0000" style="background:#ff0000"></div>
+            <div class="color-btn" data-color="#00ff00" style="background:#00ff00"></div>
+            <div class="color-btn" data-color="#0000ff" style="background:#0000ff"></div>
+            <div class="color-btn" data-color="#ffff00" style="background:#ffff00"></div>
+            <div class="color-btn" data-color="#ff00ff" style="background:#ff00ff"></div>
+            <div class="color-btn" data-color="#00ffff" style="background:#00ffff"></div>
+            <div class="color-btn" data-color="#ffa500" style="background:#ffa500"></div>
+            <div class="color-btn" data-color="#800080" style="background:#800080"></div>
+            <div class="color-btn" data-color="#000000" style="background:#000000"></div>
+            <div class="color-btn" data-color="#ffffff" style="background:#ffffff"></div>
+        </div>
+      </div>
+    </div>
+
+      <div class="main-area">
+        <div class="board-container">
+          <div class="labels">
+            <div class="label-item top">上方<br>（電源）</div>
+            <div class="label-separator"></div>
+            <div class="label-item mid-upper">上半<br>（信號）</div>
+            <div class="label-separator"></div>
+            <div class="label-item mid-lower">下半<br>（信號）</div>
+            <div class="label-separator"></div>
+            <div class="label-item bottom">下方<br>（電源）</div>
+          </div>
+
+          <div class="board" id="breadboard">
+            <!-- SVG overlay for wires -->
+            <svg class="wire-svg" id="wireSvg"></svg>
+            
+            <!-- 上方電源軌 -->
+            <div class="rail-section">
+              <div class="rail-label">+</div>
+              <div class="rails" id="railTopA"></div>
+              <div class="rail-label">-</div>
+              <div class="rails" id="railTopB"></div>
+            </div>
+
+            <!-- 分隔線 -->
+            <div class="separator"></div>
+
+            <!-- 中間區域 -->
+            <div class="mid-section">
+              <div class="mid-block" id="midUpper"></div>
+              <div class="mid-block" id="midLower"></div>
+            </div>
+
+            <!-- 分隔線 -->
+            <div class="separator"></div>
+
+            <!-- 下方電源軌 -->
+            <div class="rail-section">
+              <div class="rail-label">+</div>
+              <div class="rails" id="railBotA"></div>
+              <div class="rail-label">-</div>
+              <div class="rails" id="railBotB"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wire-info" id="wireInfo">
+            當前設定：<br>
+            顏色 <span style="display:inline-block;width:12px;height:12px;background:#ff0000;border:1px solid #999;border-radius:50%;vertical-align:middle;"></span><br>
+            點擊兩個孔洞建立連線
+          </div>
+          <button class="clear-btn" id="clearBtn">清除所有線路</button>
+        </div>
+      </div>
+
+      <div class="legend">左鍵：建立杜邦線連接，顯示完整電氣網路（綠色）｜右鍵：查看麵包板內部連通（橙色）</div>
+    </div>
+  </div>
+
+  <script>
+    // Dupont wire system
+    (function(){
+      const COLS = 10;
+      const railIds = ['railTopA','railTopB','railBotA','railBotB'];
+      const rails = railIds.map(id => document.getElementById(id));
+      const midUpper = document.getElementById('midUpper');
+      const midLower = document.getElementById('midLower');
+      const colorGrid = document.getElementById('colorGrid');
+      const wireInfo = document.getElementById('wireInfo');
+      const clearBtn = document.getElementById('clearBtn');
+      const board = document.getElementById('breadboard');
+      const wireSvg = document.getElementById('wireSvg');
+
+      let currentColor = '#ff0000';
+      let selectedHole = null;
+      let wires = [];
+
+      function makeHole(parent, groupId){
+        const h = document.createElement('div');
+        h.className = 'hole';
+        h.dataset.group = groupId;
+        h.dataset.id = Math.random().toString(36).substr(2, 9);
+        parent.appendChild(h);
+        return h;
+      }
+
+      // 電源軌：同一 rail 內的所有洞都相通
+      rails.forEach((rail, railIndex) => {
+        const groupId = `R${railIndex}`;
+        for(let i = 0; i < COLS; i++){
+          makeHole(rail, groupId);
+        }
+      });
+
+      function buildMidBlock(container, prefix){
+        // 創建 5行 x 10列 的grid，按行填充
+        const holes = [];
+        
+        // 先創建所有洞位，按grid順序（行優先）
+        for(let row = 0; row < 5; row++){
+          for(let col = 0; col < COLS; col++){
+            const hole = makeHole(container, ''); // 暫時不設group
+            holes.push({hole, row, col});
+          }
+        }
+        
+        // 然後按縱列設置group（同一列的洞相通）
+        for(let col = 0; col < COLS; col++){
+          const groupId = `${prefix}${col}`;
+          holes.filter(h => h.col === col).forEach(h => {
+            h.hole.dataset.group = groupId;
+          });
+        }
+      }
+
+      buildMidBlock(midUpper, 'U');
+      buildMidBlock(midLower, 'L');
+
+      // Color selection
+      colorGrid.addEventListener('click', (e)=>{
+        if (!e.target.classList.contains('color-btn')) return;
+        colorGrid.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentColor = e.target.dataset.color;
+        updateActiveHoleColor();
+        updateWireInfo();
+      });
+
+      function updateActiveHoleColor() {
+        // 根據選擇的顏色計算邊框色和陰影色
+        const color = currentColor;
+        let borderColor = color;
+        let shadowColor = color;
+        
+        // 對於較亮的顏色，使邊框更深一些
+        if (color === '#ffff00' || color === '#ffffff') {
+          borderColor = '#999';
+        }
+        
+        // 設定CSS變數來控制選中孔洞的顏色
+        document.documentElement.style.setProperty('--active-color', color);
+        document.documentElement.style.setProperty('--active-border', borderColor);
+        document.documentElement.style.setProperty('--active-shadow', shadowColor + '99'); // 添加透明度
+      }
+
+      function updateWireInfo(){
+        wireInfo.innerHTML = `當前設定：<br>顏色 <span style="display:inline-block;width:12px;height:12px;background:${currentColor};border:1px solid #999;border-radius:50%;vertical-align:middle;"></span><br>點擊兩個孔洞建立連線`;
+      }
+
+      function getHolePosition(hole){
+        const rect = hole.getBoundingClientRect();
+        const boardRect = board.getBoundingClientRect();
+        return {
+          x: rect.left - boardRect.left + rect.width/2,
+          y: rect.top - boardRect.top + rect.height/2
+        };
+      }
+
+      function createWire(hole1, hole2, color){
+        const pos1 = getHolePosition(hole1);
+        const pos2 = getHolePosition(hole2);
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', pos1.x);
+        line.setAttribute('y1', pos1.y);
+        line.setAttribute('x2', pos2.x);
+        line.setAttribute('y2', pos2.y);
+        line.setAttribute('stroke', color);
+        line.classList.add('wire-line');
+        
+        wireSvg.appendChild(line);
+        
+        return {
+          element: line,
+          hole1: hole1.dataset.id,
+          hole2: hole2.dataset.id,
+          color: color
+        };
+      }
+
+      function redrawWires(){
+        // 清除現有線條
+        wireSvg.innerHTML = '';
+        
+        // 重繪所有線條
+        wires.forEach(wire => {
+          const hole1 = document.querySelector(`[data-id="${wire.hole1}"]`);
+          const hole2 = document.querySelector(`[data-id="${wire.hole2}"]`);
+          if (hole1 && hole2) {
+            const pos1 = getHolePosition(hole1);
+            const pos2 = getHolePosition(hole2);
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', pos1.x);
+            line.setAttribute('y1', pos1.y);
+            line.setAttribute('x2', pos2.x);
+            line.setAttribute('y2', pos2.y);
+            line.setAttribute('stroke', wire.color);
+            line.classList.add('wire-line');
+            
+            wireSvg.appendChild(line);
+            wire.element = line;
+          }
+        });
+      }
+
+      // 更新連接洞位的高亮顯示（包含電氣相通的洞位）
+      function updateConnectedHoles(){
+        // 先清除所有連接高亮
+        board.querySelectorAll('.hole.connected').forEach(h => h.classList.remove('connected'));
+        
+        // 建立電氣連接網路
+        const electricalNetworks = [];
+        
+        // 先收集所有直接杜邦線連接
+        const directConnections = new Map();
+        wires.forEach(wire => {
+          const hole1 = document.querySelector(`[data-id="${wire.hole1}"]`);
+          const hole2 = document.querySelector(`[data-id="${wire.hole2}"]`);
+          if (hole1 && hole2) {
+            if (!directConnections.has(wire.hole1)) {
+              directConnections.set(wire.hole1, new Set());
+            }
+            if (!directConnections.has(wire.hole2)) {
+              directConnections.set(wire.hole2, new Set());
+            }
+            directConnections.get(wire.hole1).add(wire.hole2);
+            directConnections.get(wire.hole2).add(wire.hole1);
+          }
+        });
+        
+        // 為每個有杜邦線連接的洞位找出完整的電氣網路
+        const visitedHoles = new Set();
+        directConnections.forEach((connections, holeId) => {
+          if (!visitedHoles.has(holeId)) {
+            const network = new Set();
+            const queue = [holeId];
+            
+            while (queue.length > 0) {
+              const currentHoleId = queue.shift();
+              if (visitedHoles.has(currentHoleId)) continue;
+              
+              visitedHoles.add(currentHoleId);
+              network.add(currentHoleId);
+              
+              const currentHole = document.querySelector(`[data-id="${currentHoleId}"]`);
+              if (currentHole) {
+                // 添加麵包板內部相通的洞位
+                const group = currentHole.dataset.group;
+                board.querySelectorAll(`[data-group="${group}"]`).forEach(relatedHole => {
+                  const relatedHoleId = relatedHole.dataset.id;
+                  if (!visitedHoles.has(relatedHoleId)) {
+                    network.add(relatedHoleId);
+                    queue.push(relatedHoleId);
+                  }
+                });
+                
+                // 添加杜邦線連接的洞位
+                if (directConnections.has(currentHoleId)) {
+                  directConnections.get(currentHoleId).forEach(connectedHoleId => {
+                    if (!visitedHoles.has(connectedHoleId)) {
+                      queue.push(connectedHoleId);
+                    }
+                  });
+                }
+              }
+            }
+            
+            if (network.size > 1) {
+              electricalNetworks.push(network);
+            }
+          }
+        });
+        
+        // 高亮所有電氣網路中的洞位
+        electricalNetworks.forEach(network => {
+          network.forEach(holeId => {
+            const hole = document.querySelector(`[data-id="${holeId}"]`);
+            if (hole) {
+              hole.classList.add('connected');
+            }
+          });
+        });
+      }
+
+      // 麵包板連通高亮功能（右鍵點擊）
+      function clearActive(){ board.querySelectorAll('.hole.active').forEach(h=>h.classList.remove('active')); }
+      let currentActiveGroup = null;
+
+      board.addEventListener('contextmenu', (e)=>{
+        e.preventDefault(); // 防止右鍵選單出現
+        if(e.target.classList.contains('hole')){
+          const group = e.target.dataset.group;
+          
+          // 如果點擊的是已經高亮的群組，則熄滅
+          if(currentActiveGroup === group){
+            clearActive();
+            currentActiveGroup = null;
+          } else {
+            // 否則高亮新的群組
+            clearActive();
+            board.querySelectorAll(`.hole[data-group="${group}"]`).forEach(h=>h.classList.add('active'));
+            currentActiveGroup = group;
+          }
+        }
+      });
+
+      // Hole selection and wire creation
+      board.addEventListener('click', (e)=>{
+        if (!e.target.classList.contains('hole')) return;
+
+        if (!selectedHole) {
+          // 第一個孔洞：選中它
+          selectedHole = e.target;
+          selectedHole.classList.add('selected');
+        } else if (selectedHole === e.target) {
+          // 點擊同一個孔洞：取消選擇
+          selectedHole.classList.remove('selected');
+          selectedHole = null;
+        } else {
+          // 第二個孔洞：建立連線
+          const wire = createWire(selectedHole, e.target, currentColor);
+          wires.push(wire);
+          
+          selectedHole.classList.remove('selected');
+          selectedHole = null;
+          
+          // 更新連接洞位的高亮
+          updateConnectedHoles();
+        }
+      });
+
+      // Clear all wires
+      clearBtn.addEventListener('click', ()=>{
+        wires = [];
+        wireSvg.innerHTML = '';
+        if (selectedHole) {
+          selectedHole.classList.remove('selected');
+        selectedHole = null;
+        }
+        // 清除連接高亮
+        updateConnectedHoles();
+      });
+
+      // Initialize
+      updateActiveHoleColor();
+      updateWireInfo();
+
+      // Redraw wires on window resize
+      window.addEventListener('resize', ()=>{
+        setTimeout(redrawWires, 100);
+      });
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>七段數碼管 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --muted:#6c757d;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+      --segment-on:#ff3333;
+      --segment-off:#333333;
+      --segment-glow:#ff6666;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.1rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1200px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border)}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600}
+
+    /* Seven Segment Display */
+    .display-container{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:300px;
+      background:linear-gradient(145deg, #1a1a1a, #2a2a2a);
+      border-radius:12px;
+      position:relative;
+      overflow:hidden;
+      border:3px solid #333;
+    }
+
+    .seven-segment{
+      position:relative;
+      width:150px;
+      height:220px;
+      margin:20px;
+    }
+
+    .segment{
+      position:absolute;
+      background:var(--segment-off);
+      border-radius:3px;
+      transition:all 0.3s ease;
+      cursor:pointer;
+      border:1px solid #555;
+    }
+
+    .segment.on{
+      background:var(--segment-on);
+      box-shadow:0 0 15px var(--segment-glow), 0 0 30px var(--segment-glow);
+      border-color:var(--segment-on);
+    }
+
+    .segment:hover{
+      opacity:0.8;
+      transform:scale(1.05);
+    }
+
+    /* Segment positioning and sizing */
+    .segment-a{
+      top:5px;
+      left:15px;
+      right:15px;
+      height:12px;
+      clip-path:polygon(8px 0%, calc(100% - 8px) 0%, 100% 100%, 0% 100%);
+    }
+
+    .segment-b{
+      top:20px;
+      right:5px;
+      width:12px;
+      height:80px;
+      clip-path:polygon(0% 8px, 100% 0%, 100% calc(100% - 8px), 0% 100%);
+    }
+
+    .segment-c{
+      bottom:20px;
+      right:5px;
+      width:12px;
+      height:80px;
+      clip-path:polygon(0% 0%, 100% 8px, 100% 100%, 0% calc(100% - 8px));
+    }
+
+    .segment-d{
+      bottom:5px;
+      left:15px;
+      right:15px;
+      height:12px;
+      clip-path:polygon(0% 0%, 100% 0%, calc(100% - 8px) 100%, 8px 100%);
+    }
+
+    .segment-e{
+      bottom:20px;
+      left:5px;
+      width:12px;
+      height:80px;
+      clip-path:polygon(0% 8px, 100% 0%, 100% calc(100% - 8px), 0% 100%);
+    }
+
+    .segment-f{
+      top:20px;
+      left:5px;
+      width:12px;
+      height:80px;
+      clip-path:polygon(0% 0%, 100% 8px, 100% calc(100% - 8px), 0% 100%);
+    }
+
+    .segment-g{
+      top:50%;
+      left:15px;
+      right:15px;
+      height:12px;
+      transform:translateY(-50%);
+      clip-path:polygon(8px 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0% 50%);
+    }
+
+    .segment-dp{
+      bottom:5px;
+      right:-10px;
+      width:15px;
+      height:15px;
+      border-radius:50%;
+    }
+
+    /* Segment labels */
+    .segment-label{
+      position:absolute;
+      font-size:14px;
+      font-weight:bold;
+      color:#fff;
+      text-shadow:1px 1px 2px rgba(0,0,0,0.8);
+      pointer-events:none;
+      z-index:10;
+    }
+
+    .label-a{top:-5px;left:50%;transform:translateX(-50%)}
+    .label-b{top:30px;right:-15px}
+    .label-c{bottom:30px;right:-15px}
+    .label-d{bottom:-5px;left:50%;transform:translateX(-50%)}
+    .label-e{bottom:30px;left:-15px}
+    .label-f{top:30px;left:-15px}
+    .label-g{top:50%;left:50%;transform:translate(-50%,-50%)}
+    .label-dp{bottom:-5px;right:-25px}
+
+    /* Controls */
+    .controls{display:grid;gap:20px}
+
+    .control-group{
+      background:var(--surface);
+      border-radius:8px;
+      padding:20px;
+      border:1px solid var(--border);
+    }
+
+    .control-group h4{
+      margin-bottom:15px;
+      color:var(--primary);
+      font-size:1.1rem;
+    }
+
+    .segment-controls{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .segment-btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      background:var(--surface);
+      border:2px solid var(--border);
+      border-radius:8px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      font-weight:600;
+      font-size:14px;
+      min-height:50px;
+    }
+
+    .segment-btn:hover{border-color:var(--primary);background:var(--secondary)}
+    .segment-btn.active{background:var(--segment-on);color:white;border-color:var(--segment-on)}
+
+    .number-controls{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+      margin-bottom:20px;
+    }
+
+    .number-btn{
+      padding:15px 10px;
+      background:var(--surface);
+      border:2px solid var(--border);
+      border-radius:8px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      text-align:center;
+      font-weight:600;
+      font-size:16px;
+    }
+
+    .number-btn:hover{border-color:var(--primary);background:var(--secondary)}
+    .number-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+
+    /* Status Panel */
+    .status-panel{
+      background:var(--secondary);
+      border-radius:8px;
+      padding:20px;
+      margin-top:20px;
+    }
+
+    .status-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-bottom:10px;
+    }
+
+    .status-label{font-weight:600;color:var(--muted)}
+    .status-value{font-weight:600;color:var(--text)}
+
+    .binary-display{
+      font-family:monospace;
+      font-size:14px;
+      background:white;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:10px;
+      margin:10px 0;
+    }
+
+    .binary-bit{
+      display:inline-block;
+      margin:0 2px;
+      padding:4px 6px;
+      background:var(--surface);
+      border-radius:3px;
+    }
+
+    .binary-bit.on{
+      background:var(--segment-on);
+      color:white;
+    }
+
+    /* Circuit Diagram */
+    .circuit-container{
+      background:white;
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:20px;
+      margin:20px 0;
+      text-align:center;
+    }
+
+    .pin-diagram{
+      display:grid;
+      grid-template-columns:1fr 100px 1fr;
+      gap:20px;
+      align-items:center;
+      margin:20px 0;
+    }
+
+    .pin-list{
+      background:var(--surface);
+      border-radius:8px;
+      padding:15px;
+    }
+
+    .pin-item{
+      display:flex;
+      justify-content:space-between;
+      padding:5px 0;
+      font-size:12px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .pin-item:last-child{border-bottom:none}
+
+    .pin-number{
+      font-weight:bold;
+      color:var(--primary);
+    }
+
+    .ic-shape{
+      width:80px;
+      height:120px;
+      background:linear-gradient(145deg, #2c3e50, #34495e);
+      border-radius:8px;
+      position:relative;
+      margin:0 auto;
+    }
+
+    .ic-shape::before{
+      content:'7447';
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      color:white;
+      font-size:10px;
+      font-weight:bold;
+    }
+
+    .ic-notch{
+      position:absolute;
+      top:5px;
+      left:50%;
+      transform:translateX(-50%);
+      width:20px;
+      height:8px;
+      background:#1a252f;
+      border-radius:4px;
+    }
+
+    .legend{
+      background:var(--surface);
+      border-radius:8px;
+      padding:15px;
+      margin-top:20px;
+      font-size:14px;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    @media (max-width: 768px) {
+      .grid{grid-template-columns:1fr;gap:20px}
+      .header h1{font-size:2rem}
+      .segment-controls{grid-template-columns:repeat(2,1fr)}
+      .number-controls{grid-template-columns:repeat(3,1fr)}
+      .pin-diagram{grid-template-columns:1fr;gap:15px}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>七段數碼管</h1>
+    <p>學習數碼管的顯示邏輯與電路連接原理</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <!-- Display Visual -->
+      <div class="card">
+        <h3>七段數碼管顯示</h3>
+        <div class="display-container">
+          <div class="seven-segment" id="sevenSegment">
+            <!-- Segments A-G and DP -->
+            <div class="segment segment-a" data-segment="a" id="segment-a"></div>
+            <div class="segment segment-b" data-segment="b" id="segment-b"></div>
+            <div class="segment segment-c" data-segment="c" id="segment-c"></div>
+            <div class="segment segment-d" data-segment="d" id="segment-d"></div>
+            <div class="segment segment-e" data-segment="e" id="segment-e"></div>
+            <div class="segment segment-f" data-segment="f" id="segment-f"></div>
+            <div class="segment segment-g" data-segment="g" id="segment-g"></div>
+            <div class="segment segment-dp" data-segment="dp" id="segment-dp"></div>
+            
+            <!-- Labels -->
+            <div class="segment-label label-a">A</div>
+            <div class="segment-label label-b">B</div>
+            <div class="segment-label label-c">C</div>
+            <div class="segment-label label-d">D</div>
+            <div class="segment-label label-e">E</div>
+            <div class="segment-label label-f">F</div>
+            <div class="segment-label label-g">G</div>
+            <div class="segment-label label-dp">DP</div>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <div class="status-row">
+            <div class="status-label">顯示數字:</div>
+            <div class="status-value" id="currentNumber">自定義</div>
+          </div>
+          <div class="status-row">
+            <div class="status-label">亮起段數:</div>
+            <div class="status-value" id="activeSegments">0/8</div>
+          </div>
+          <div class="binary-display">
+            <strong>二進制編碼 (A-G,DP):</strong><br>
+            <span class="binary-bit" id="bit-a">0</span>
+            <span class="binary-bit" id="bit-b">0</span>
+            <span class="binary-bit" id="bit-c">0</span>
+            <span class="binary-bit" id="bit-d">0</span>
+            <span class="binary-bit" id="bit-e">0</span>
+            <span class="binary-bit" id="bit-f">0</span>
+            <span class="binary-bit" id="bit-g">0</span>
+            <span class="binary-bit" id="bit-dp">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="card">
+        <h3>數碼管控制</h3>
+        <div class="controls">
+          <div class="control-group">
+            <h4>數字顯示 (0-9)</h4>
+            <div class="number-controls" id="numberControls">
+              <div class="number-btn" data-number="0">0</div>
+              <div class="number-btn" data-number="1">1</div>
+              <div class="number-btn" data-number="2">2</div>
+              <div class="number-btn" data-number="3">3</div>
+              <div class="number-btn" data-number="4">4</div>
+              <div class="number-btn" data-number="5">5</div>
+              <div class="number-btn" data-number="6">6</div>
+              <div class="number-btn" data-number="7">7</div>
+              <div class="number-btn" data-number="8">8</div>
+              <div class="number-btn" data-number="9">9</div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>段控制 (點擊切換)</h4>
+            <div class="segment-controls" id="segmentControls">
+              <div class="segment-btn" data-segment="a">段 A</div>
+              <div class="segment-btn" data-segment="b">段 B</div>
+              <div class="segment-btn" data-segment="c">段 C</div>
+              <div class="segment-btn" data-segment="d">段 D</div>
+              <div class="segment-btn" data-segment="e">段 E</div>
+              <div class="segment-btn" data-segment="f">段 F</div>
+              <div class="segment-btn" data-segment="g">段 G</div>
+              <div class="segment-btn" data-segment="dp">小數點</div>
+            </div>
+            <div style="text-align:center;margin-top:15px">
+              <button class="number-btn" onclick="clearAll()" style="background:var(--danger);color:white;border-color:var(--danger)">全部清除</button>
+              <button class="number-btn" onclick="lightAll()" style="background:var(--success);color:white;border-color:var(--success);margin-left:10px">全部點亮</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>演示功能</h4>
+            <div style="text-align:center">
+              <button class="number-btn" onclick="startDemo()" id="demoBtn" style="background:var(--warning);color:white;border-color:var(--warning);margin:5px">開始 0-9 演示</button>
+              <button class="number-btn" onclick="stopDemo()" style="background:var(--muted);color:white;border-color:var(--muted);margin:5px">停止演示</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px">
+              自動依序顯示數字 0 到 9，觀察每個數字的段組合
+            </div>
+          </div>
+        </div>
+
+        <div class="legend">
+          點擊數字按鈕顯示對應數字，或單獨控制每一段LED。<br>
+          七段數碼管透過組合不同的段來顯示0-9數字。
+        </div>
+      </div>
+    </div>
+
+    <!-- Circuit Diagram -->
+    <div class="card" style="margin-top:30px">
+      <h3>電路連接與工作原理</h3>
+      
+      <div class="circuit-container">
+        <h4>七段數碼管接腳圖</h4>
+        <div class="pin-diagram">
+          <div class="pin-list">
+            <div class="pin-item">
+              <span class="pin-number">10</span>
+              <span>段 A</span>
+            </div>
+            <div class="pin-item">
+              <span class="pin-number">9</span>
+              <span>段 F</span>
+            </div>
+            <div class="pin-item">
+              <span class="pin-number">8</span>
+              <span>COM (共陰/共陽)</span>
+            </div>
+            <div class="pin-item">
+              <span class="pin-number">7</span>
+              <span>段 B</span>
+            </div>
+            <div class="pin-item">
+              <span class="pin-number">6</span>
+              <span>段 E</span>
+            </div>
+          </div>
+          
+          <div class="ic-shape">
+            <div class="ic-notch"></div>
+          </div>
+          
+          <div class="pin-list">
+            <div class="pin-item">
+              <span>段 G</span>
+              <span class="pin-number">1</span>
+            </div>
+            <div class="pin-item">
+              <span>段 C</span>
+              <span class="pin-number">2</span>
+            </div>
+            <div class="pin-item">
+              <span>小數點 (DP)</span>
+              <span class="pin-number">3</span>
+            </div>
+            <div class="pin-item">
+              <span>段 D</span>
+              <span class="pin-number">4</span>
+            </div>
+            <div class="pin-item">
+              <span>COM (共陰/共陽)</span>
+              <span class="pin-number">5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
+        <div class="control-group">
+          <h4>🔌 共陰極接法</h4>
+          <div style="font-size:14px;line-height:1.5">
+            <p><strong>原理：</strong>所有LED的陰極連接在一起接地</p>
+            <p><strong>控制：</strong>給對應段高電位(+)就會亮起</p>
+            <p><strong>邏輯：</strong>1 = 亮，0 = 滅</p>
+            <div style="background:var(--surface);padding:10px;border-radius:6px;margin-top:10px">
+              <strong>Arduino程式碼：</strong><br>
+              <code style="font-size:12px">digitalWrite(段腳位, HIGH); // 點亮</code>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <h4>🔌 共陽極接法</h4>
+          <div style="font-size:14px;line-height:1.5">
+            <p><strong>原理：</strong>所有LED的陽極連接在一起接VCC</p>
+            <p><strong>控制：</strong>給對應段低電位(-)就會亮起</p>
+            <p><strong>邏輯：</strong>0 = 亮，1 = 滅</p>
+            <div style="background:var(--surface);padding:10px;border-radius:6px;margin-top:10px">
+              <strong>Arduino程式碼：</strong><br>
+              <code style="font-size:12px">digitalWrite(段腳位, LOW); // 點亮</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group" style="margin-top:20px">
+        <h4>📊 數字編碼表 (共陰極)</h4>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-size:12px">
+          <div style="text-align:center;font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">數字</div>
+          <div style="text-align:center;font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">A B C D E F G</div>
+          <div style="text-align:center;font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">二進制</div>
+          <div style="text-align:center;font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">十六進制</div>
+          <div style="text-align:center;font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">十進制</div>
+          
+          <div style="text-align:center;padding:6px;background:var(--surface)">0</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1111110</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0111111</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0x3F</div>
+          <div style="text-align:center;padding:6px;background:var(--surface)">63</div>
+          
+          <div style="text-align:center;padding:6px;background:var(--surface)">1</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0110000</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0000110</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0x06</div>
+          <div style="text-align:center;padding:6px;background:var(--surface)">6</div>
+          
+          <div style="text-align:center;padding:6px;background:var(--surface)">2</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1101101</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1011011</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0x5B</div>
+          <div style="text-align:center;padding:6px;background:var(--surface)">91</div>
+          
+          <div style="text-align:center;padding:6px;background:var(--surface)">3</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1111001</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1001111</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0x4F</div>
+          <div style="text-align:center;padding:6px;background:var(--surface)">79</div>
+          
+          <div style="text-align:center;padding:6px;background:var(--surface)">4</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0110011</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">1100110</div>
+          <div style="text-align:center;padding:6px;font-family:monospace;background:var(--surface)">0x66</div>
+          <div style="text-align:center;padding:6px;background:var(--surface)">102</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // Elements
+      const sevenSegment = document.getElementById('sevenSegment');
+      const numberControls = document.getElementById('numberControls');
+      const segmentControls = document.getElementById('segmentControls');
+      const currentNumber = document.getElementById('currentNumber');
+      const activeSegments = document.getElementById('activeSegments');
+
+      // State
+      let segments = {
+        a: false, b: false, c: false, d: false,
+        e: false, f: false, g: false, dp: false
+      };
+      let demoInterval = null;
+      let isDemo = false;
+
+      // Number patterns (which segments to light for each digit)
+      const numberPatterns = {
+        0: ['a', 'b', 'c', 'd', 'e', 'f'],
+        1: ['b', 'c'],
+        2: ['a', 'b', 'g', 'e', 'd'],
+        3: ['a', 'b', 'g', 'c', 'd'],
+        4: ['f', 'g', 'b', 'c'],
+        5: ['a', 'f', 'g', 'c', 'd'],
+        6: ['a', 'f', 'g', 'e', 'd', 'c'],
+        7: ['a', 'b', 'c'],
+        8: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+        9: ['a', 'b', 'c', 'd', 'f', 'g']
+      };
+
+      // Helper functions
+      function updateSegmentDisplay() {
+        // Update visual segments
+        Object.keys(segments).forEach(segment => {
+          const segmentElement = document.getElementById(`segment-${segment}`);
+          const binaryBit = document.getElementById(`bit-${segment}`);
+          
+          if (segments[segment]) {
+            segmentElement.classList.add('on');
+            binaryBit.classList.add('on');
+            binaryBit.textContent = '1';
+          } else {
+            segmentElement.classList.remove('on');
+            binaryBit.classList.remove('on');
+            binaryBit.textContent = '0';
+          }
+        });
+
+        // Update segment control buttons
+        segmentControls.querySelectorAll('.segment-btn').forEach(btn => {
+          const segment = btn.dataset.segment;
+          if (segments[segment]) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        // Update status
+        const activeCount = Object.values(segments).filter(Boolean).length;
+        activeSegments.textContent = `${activeCount}/8`;
+      }
+
+      function displayNumber(num) {
+        // Clear all segments first
+        Object.keys(segments).forEach(segment => {
+          segments[segment] = false;
+        });
+
+        // Light up segments for the number
+        if (numberPatterns[num]) {
+          numberPatterns[num].forEach(segment => {
+            segments[segment] = true;
+          });
+        }
+
+        // Update display
+        updateSegmentDisplay();
+        
+        // Update status
+        currentNumber.textContent = num;
+        
+        // Update number buttons
+        numberControls.querySelectorAll('.number-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        numberControls.querySelector(`[data-number="${num}"]`)?.classList.add('active');
+      }
+
+      function toggleSegment(segment) {
+        segments[segment] = !segments[segment];
+        updateSegmentDisplay();
+        
+        // Clear number button selection since it's now custom
+        numberControls.querySelectorAll('.number-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        currentNumber.textContent = '自定義';
+      }
+
+      function clearAll() {
+        Object.keys(segments).forEach(segment => {
+          segments[segment] = false;
+        });
+        updateSegmentDisplay();
+        numberControls.querySelectorAll('.number-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        currentNumber.textContent = '自定義';
+      }
+
+      function lightAll() {
+        Object.keys(segments).forEach(segment => {
+          segments[segment] = true;
+        });
+        updateSegmentDisplay();
+        numberControls.querySelectorAll('.number-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        currentNumber.textContent = '全亮';
+      }
+
+      function startDemo() {
+        if (isDemo) return; // 防止重複啟動
+        
+        isDemo = true;
+        const demoBtn = document.getElementById('demoBtn');
+        demoBtn.textContent = '演示中...';
+        demoBtn.style.background = '#6c757d';
+        
+        let count = 0;
+        
+        // 先顯示數字0
+        displayNumber(0);
+        
+        demoInterval = setInterval(() => {
+          count++;
+          if (count <= 9) {
+            displayNumber(count);
+          } else {
+            // 演示結束
+            clearInterval(demoInterval);
+            isDemo = false;
+            demoBtn.textContent = '開始 0-9 演示';
+            demoBtn.style.background = 'var(--warning)';
+            
+            // 演示結束後清除顯示
+            setTimeout(() => {
+              clearAll();
+            }, 1000);
+          }
+        }, 1000); // 每秒切換一個數字
+      }
+
+      function stopDemo() {
+        if (demoInterval) {
+          clearInterval(demoInterval);
+          demoInterval = null;
+        }
+        isDemo = false;
+        const demoBtn = document.getElementById('demoBtn');
+        demoBtn.textContent = '開始 0-9 演示';
+        demoBtn.style.background = 'var(--warning)';
+        clearAll();
+      }
+
+      // Event listeners
+      numberControls.addEventListener('click', (e) => {
+        const btn = e.target.closest('.number-btn');
+        if (!btn || !btn.dataset.number) return;
+        
+        const number = parseInt(btn.dataset.number);
+        displayNumber(number);
+      });
+
+      segmentControls.addEventListener('click', (e) => {
+        const btn = e.target.closest('.segment-btn');
+        if (!btn || !btn.dataset.segment) return;
+        
+        const segment = btn.dataset.segment;
+        toggleSegment(segment);
+      });
+
+      // Direct segment clicking
+      sevenSegment.addEventListener('click', (e) => {
+        const segment = e.target.closest('.segment');
+        if (!segment) return;
+        
+        const segmentName = segment.dataset.segment;
+        if (segmentName) {
+          toggleSegment(segmentName);
+        }
+      });
+
+      // Global functions for buttons
+      window.clearAll = clearAll;
+      window.lightAll = lightAll;
+      window.startDemo = startDemo;
+      window.stopDemo = stopDemo;
+
+      // Initialize
+      updateSegmentDisplay();
+    })();
+  </script>
+</body>
+</html>

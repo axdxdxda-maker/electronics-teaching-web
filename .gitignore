@@ -1,0 +1,20 @@
+# IDE 設定檔
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 暫存檔案
+*.tmp
+*.temp
+*.log
+
+# Node modules (如果未來加入)
+node_modules/
+

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>家裡的電路 - 基礎電路教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --home: #4CAF50;
+      --danger: #F44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .house-diagram {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .house-container {
+      background: linear-gradient(135deg, #87CEEB, #98FB98);
+      border: 3px solid var(--home);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+      min-height: 400px;
+    }
+
+    .room {
+      position: absolute;
+      background: rgba(255,255,255,0.8);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .room:hover {
+      background: rgba(255,255,255,0.95);
+      transform: scale(1.05);
+    }
+
+    .room.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .living-room {
+      top: 20px;
+      left: 20px;
+      width: 120px;
+      height: 80px;
+    }
+
+    .kitchen {
+      top: 20px;
+      right: 20px;
+      width: 120px;
+      height: 80px;
+    }
+
+    .bedroom {
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 80px;
+    }
+
+    .bathroom {
+      bottom: 20px;
+      right: 20px;
+      width: 120px;
+      height: 80px;
+    }
+
+    .electrical-panel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #333;
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .appliances-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .appliance-card {
+      background: var(--background);
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s;
+      border-top: 4px solid;
+    }
+
+    .appliance-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .appliance-card.high-power {
+      border-top-color: var(--danger);
+    }
+
+    .appliance-card.medium-power {
+      border-top-color: var(--secondary);
+    }
+
+    .appliance-card.low-power {
+      border-top-color: var(--home);
+    }
+
+    .safety-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .safety-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .safety-card {
+      background: var(--background);
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .house-container {
+        min-height: 500px;
+      }
+      
+      .room {
+        position: relative;
+        display: inline-block;
+        margin: 0.5rem;
+        width: auto;
+        height: auto;
+      }
+      
+      .electrical-panel {
+        position: relative;
+        transform: none;
+        margin: 1rem auto;
+        display: block;
+      }
+      
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>🏠 家裡的電路</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>🏠 從插座到電燈，探索家中的電路世界</h2>
+      <p>你知道嗎？家裡的每個電器都連接在一個大型的電路系統中！讓我們一起認識家中的電路，學會安全使用電器。</p>
+    </div>
+
+    <div class="house-diagram">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🏘️ 家庭電路地圖</h3>
+      
+      <div class="house-container">
+        <div class="room living-room" onclick="showRoomInfo('living')">
+          <div style="font-size: 2rem;">🛋️</div>
+          <div>客廳</div>
+        </div>
+        
+        <div class="room kitchen" onclick="showRoomInfo('kitchen')">
+          <div style="font-size: 2rem;">🍳</div>
+          <div>廚房</div>
+        </div>
+        
+        <div class="room bedroom" onclick="showRoomInfo('bedroom')">
+          <div style="font-size: 2rem;">🛏️</div>
+          <div>臥室</div>
+        </div>
+        
+        <div class="room bathroom" onclick="showRoomInfo('bathroom')">
+          <div style="font-size: 2rem;">🚿</div>
+          <div>浴室</div>
+        </div>
+        
+        <div class="electrical-panel" onclick="showRoomInfo('panel')">
+          <div style="font-size: 1.5rem;">⚡</div>
+          <div>配電箱</div>
+        </div>
+      </div>
+
+      <div id="roomInfo" style="background: var(--background); padding: 1.5rem; border-radius: 10px; margin-top: 2rem; display: none;">
+        <h4 id="roomTitle"></h4>
+        <p id="roomDescription"></p>
+        <div id="roomAppliances"></div>
+      </div>
+    </div>
+
+    <div class="safety-section">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">⚡ 家電功率大解密</h3>
+      
+      <div class="appliances-grid">
+        <div class="appliance-card high-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">❄️</div>
+          <h4>冷氣機</h4>
+          <p><strong>功率：</strong>1000-2000瓦</p>
+          <p><strong>用電量：</strong>很高</p>
+          <p>夏天的好朋友，但也是用電大戶！</p>
+        </div>
+
+        <div class="appliance-card high-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔥</div>
+          <h4>電磁爐</h4>
+          <p><strong>功率：</strong>1500-2000瓦</p>
+          <p><strong>用電量：</strong>很高</p>
+          <p>煮飯用的，加熱速度快但很耗電！</p>
+        </div>
+
+        <div class="appliance-card medium-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📺</div>
+          <h4>電視</h4>
+          <p><strong>功率：</strong>100-200瓦</p>
+          <p><strong>用電量：</strong>中等</p>
+          <p>娛樂必備，現代電視比較省電！</p>
+        </div>
+
+        <div class="appliance-card medium-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💻</div>
+          <h4>電腦</h4>
+          <p><strong>功率：</strong>300-500瓦</p>
+          <p><strong>用電量：</strong>中等</p>
+          <p>學習工作好幫手，記得不用時關機！</p>
+        </div>
+
+        <div class="appliance-card low-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💡</div>
+          <h4>LED燈</h4>
+          <p><strong>功率：</strong>5-15瓦</p>
+          <p><strong>用電量：</strong>很低</p>
+          <p>照明專家，省電又環保！</p>
+        </div>
+
+        <div class="appliance-card low-power">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+          <h4>手機充電器</h4>
+          <p><strong>功率：</strong>5-20瓦</p>
+          <p><strong>用電量：</strong>很低</p>
+          <p>小巧但重要，充滿就拔掉更省電！</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="safety-section">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🛡️ 家庭用電安全指南</h3>
+      
+      <div class="safety-grid">
+        <div class="safety-card">
+          <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--home);">✅</div>
+          <h4>正確使用插座</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>不要同時插太多電器</li>
+            <li>使用三孔插頭的安全插座</li>
+            <li>濕手不要碰插座</li>
+            <li>定期檢查插座是否鬆動</li>
+          </ul>
+        </div>
+
+        <div class="safety-card">
+          <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--danger);">⚠️</div>
+          <h4>避免過載</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>不要在一個插座上接太多延長線</li>
+            <li>大功率電器要單獨使用插座</li>
+            <li>注意配電箱的總開關</li>
+            <li>聞到燒焦味立即關閉電源</li>
+          </ul>
+        </div>
+
+        <div class="safety-card">
+          <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--secondary);">🔧</div>
+          <h4>定期檢查</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>檢查電線是否破損</li>
+            <li>測試斷路器是否正常</li>
+            <li>清潔插座周圍的灰塵</li>
+            <li>有問題請找專業電工</li>
+          </ul>
+        </div>
+
+        <div class="safety-card">
+          <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary);">💡</div>
+          <h4>節能小撇步</h4>
+          <ul style="text-align: left; margin-top: 1rem;">
+            <li>離開房間隨手關燈</li>
+            <li>不用的電器拔掉插頭</li>
+            <li>選擇省電標章的電器</li>
+            <li>冷氣溫度設定26-28度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; padding: 2rem; margin: 2rem 0;">
+      <h3 style="text-align: center; margin-bottom: 2rem;">🌍 保護地球的用電習慣</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
+          <h4>選擇綠能</h4>
+          <p>使用太陽能、風能等再生能源，減少對環境的影響。</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+          <h4>節省電費</h4>
+          <p>養成良好的用電習慣，不只環保還能省錢呢！</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+          <h4>智慧用電</h4>
+          <p>使用智慧插座和定時器，讓電器在最需要時才工作。</p>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔄</div>
+          <h4>回收再利用</h4>
+          <p>舊電器要正確回收，減少電子垃圾對環境的污染。</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; padding: 2rem; margin: 2rem 0; text-align: center;">
+      <h3 style="color: #155724; margin-bottom: 1rem;">🎉 恭喜完成基礎電路系列！</h3>
+      <p style="font-size: 1.1rem; margin-bottom: 1rem;">你已經學會了電流、電壓、電路、短路、開關和家庭用電的基本知識！</p>
+      <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem;">
+        <div>
+          <div style="font-size: 2rem; color: #155724;">💧</div>
+          <p>電流就像水流</p>
+        </div>
+        <div>
+          <div style="font-size: 2rem; color: #155724;">🔋</div>
+          <p>電池的秘密</p>
+        </div>
+        <div>
+          <div style="font-size: 2rem; color: #155724;">🔌</div>
+          <p>完整的電路</p>
+        </div>
+        <div>
+          <div style="font-size: 2rem; color: #155724;">⚠️</div>
+          <p>危險的短路</p>
+        </div>
+        <div>
+          <div style="font-size: 2rem; color: #155724;">💡</div>
+          <p>開關的魔法</p>
+        </div>
+        <div>
+          <div style="font-size: 2rem; color: #155724;">🏠</div>
+          <p>家裡的電路</p>
+        </div>
+      </div>
+      <p style="margin-top: 2rem; font-weight: bold;">現在你可以繼續學習電子元件，成為小小電路工程師！</p>
+    </div>
+
+    <div class="navigation">
+      <a href="switch-magic.html" class="nav-btn">⬅️ 上一課：開關的魔法</a>
+      <a href="../index.html" class="nav-btn">🎯 繼續學習電子元件 ➡️</a>
+    </div>
+  </div>
+
+  <script>
+    const roomData = {
+      living: {
+        title: '🛋️ 客廳電路',
+        description: '客廳是家中的娛樂中心，有很多電器設備。',
+        appliances: ['📺 電視', '❄️ 冷氣', '💡 燈具', '🔌 各種插座']
+      },
+      kitchen: {
+        title: '🍳 廚房電路',
+        description: '廚房有最多大功率電器，需要特別注意安全。',
+        appliances: ['🔥 電磁爐', '❄️ 冰箱', '🌀 抽油煙機', '☕ 微波爐']
+      },
+      bedroom: {
+        title: '🛏️ 臥室電路',
+        description: '臥室主要是照明和小功率電器。',
+        appliances: ['💡 檯燈', '📱 充電器', '💻 電腦', '🌀 電風扇']
+      },
+      bathroom: {
+        title: '🚿 浴室電路',
+        description: '浴室環境潮濕，電路設計特別重視安全。',
+        appliances: ['💡 防水燈具', '🌀 排風扇', '🔌 防水插座', '🔥 熱水器']
+      },
+      panel: {
+        title: '⚡ 配電箱',
+        description: '家中電路的總控制中心，所有電路都從這裡分配出去。',
+        appliances: ['🔧 總開關', '⚡ 各房間斷路器', '🛡️ 漏電保護器', '📊 電錶']
+      }
+    };
+
+    function showRoomInfo(room) {
+      const roomInfo = document.getElementById('roomInfo');
+      const roomTitle = document.getElementById('roomTitle');
+      const roomDescription = document.getElementById('roomDescription');
+      const roomAppliances = document.getElementById('roomAppliances');
+      
+      // 移除所有房間的active狀態
+      document.querySelectorAll('.room, .electrical-panel').forEach(r => {
+        r.classList.remove('active');
+      });
+      
+      // 添加active狀態到點擊的房間
+      event.target.closest('.room, .electrical-panel').classList.add('active');
+      
+      const data = roomData[room];
+      roomTitle.textContent = data.title;
+      roomDescription.textContent = data.description;
+      
+      roomAppliances.innerHTML = `
+        <h5 style="margin: 1rem 0; color: var(--primary);">主要電器設備：</h5>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+          ${data.appliances.map(appliance => 
+            `<span style="background: white; padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid var(--primary);">${appliance}</span>`
+          ).join('')}
+        </div>
+      `;
+      
+      roomInfo.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

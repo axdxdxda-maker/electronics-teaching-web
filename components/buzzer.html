@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蜂鳴器 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --muted:#6c757d;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.1rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1200px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border)}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600}
+
+    /* Buzzer Visual Container */
+    .buzzer-container{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:300px;
+      background:radial-gradient(circle, #2a2a2a 0%, #1a1a1a 100%);
+      border-radius:12px;
+      position:relative;
+      overflow:hidden;
+      border:3px solid #333;
+    }
+
+    /* Buzzer Housing */
+    .buzzer-housing{
+      position:relative;
+      width:120px;
+      height:120px;
+      background:radial-gradient(circle, #34495e, #2c3e50);
+      border-radius:50%;
+      box-shadow:0 8px 20px rgba(0,0,0,0.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:4px solid #95a5a6;
+    }
+
+    .buzzer-housing::before{
+      content:'';
+      position:absolute;
+      width:80px;
+      height:80px;
+      background:radial-gradient(circle, #1a252f, #34495e);
+      border-radius:50%;
+      border:2px solid #7f8c8d;
+    }
+
+    .buzzer-center{
+      position:absolute;
+      width:40px;
+      height:40px;
+      background:radial-gradient(circle, #bdc3c7, #95a5a6);
+      border-radius:50%;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);
+      z-index:2;
+    }
+
+    .buzzer-pins{
+      position:absolute;
+      bottom:-15px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:12px;
+    }
+
+    .buzzer-pin{
+      width:4px;
+      height:20px;
+      background:linear-gradient(180deg, #f39c12, #e67e22);
+      border-radius:2px;
+    }
+
+    .pin-label{
+      position:absolute;
+      bottom:-35px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:10px;
+      color:#fff;
+      font-weight:bold;
+    }
+
+    /* Sound Wave Animation */
+    .sound-waves{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      width:300px;
+      height:300px;
+      pointer-events:none;
+    }
+
+    .sound-wave{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      border:2px solid rgba(52,152,219,0.6);
+      border-radius:50%;
+      animation:sound-expand var(--wave-speed,1s) ease-out infinite;
+      opacity:0;
+    }
+
+    .sound-wave:nth-child(1){animation-delay:0s;width:80px;height:80px}
+    .sound-wave:nth-child(2){animation-delay:0.2s;width:120px;height:120px}
+    .sound-wave:nth-child(3){animation-delay:0.4s;width:160px;height:160px}
+    .sound-wave:nth-child(4){animation-delay:0.6s;width:200px;height:200px}
+    .sound-wave:nth-child(5){animation-delay:0.8s;width:240px;height:240px}
+
+    @keyframes sound-expand {
+      0% {
+        opacity:0.8;
+        transform:translate(-50%, -50%) scale(0.3);
+      }
+      50% {
+        opacity:0.4;
+      }
+      100% {
+        opacity:0;
+        transform:translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* Frequency Visualization */
+    .frequency-display{
+      position:absolute;
+      top:10px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.8);
+      color:#fff;
+      padding:8px 12px;
+      border-radius:6px;
+      font-size:12px;
+      font-weight:bold;
+      min-width:100px;
+      text-align:center;
+    }
+
+    /* Controls */
+    .controls{display:grid;gap:20px}
+
+    .control-group{
+      background:var(--surface);
+      border-radius:8px;
+      padding:20px;
+      border:1px solid var(--border);
+    }
+
+    .control-group h4{
+      margin-bottom:15px;
+      color:var(--primary);
+      font-size:1.1rem;
+    }
+
+    .slider-container{
+      display:grid;
+      grid-template-columns:80px 1fr 80px;
+      gap:15px;
+      align-items:center;
+      margin-bottom:15px;
+    }
+
+    .slider-label{
+      font-weight:600;
+      font-size:14px;
+      color:var(--text);
+    }
+
+    .slider{
+      -webkit-appearance:none;
+      width:100%;
+      height:8px;
+      border-radius:4px;
+      background:linear-gradient(to right, #ddd 0%, var(--primary) 100%);
+      outline:none;
+      transition:opacity 0.2s;
+    }
+
+    .slider::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background:var(--primary);
+      cursor:pointer;
+      border:2px solid white;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .slider::-moz-range-thumb{
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background:var(--primary);
+      cursor:pointer;
+      border:2px solid white;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .slider-value{
+      background:white;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:8px;
+      text-align:center;
+      font-weight:600;
+      font-size:14px;
+      min-width:70px;
+    }
+
+    /* Musical Notes */
+    .note-buttons{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:8px;
+      margin-bottom:20px;
+    }
+
+    .note-btn{
+      padding:15px 8px;
+      background:var(--surface);
+      border:2px solid var(--border);
+      border-radius:8px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      text-align:center;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .note-btn:hover{border-color:var(--primary);background:var(--secondary)}
+    .note-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+
+    .note-name{display:block;font-size:16px;margin-bottom:4px}
+    .note-freq{display:block;font-size:11px;color:var(--muted)}
+    .note-btn.active .note-freq{color:rgba(255,255,255,0.8)}
+
+    /* Arduino Code */
+    .arduino-code{
+      background:#2d3748;
+      color:#e2e8f0;
+      border-radius:8px;
+      padding:15px;
+      margin:15px 0;
+      font-family:'Courier New', monospace;
+      font-size:13px;
+      overflow-x:auto;
+    }
+
+    .code-comment{color:#68d391}
+    .code-function{color:#63b3ed}
+    .code-number{color:#f6ad55}
+    .code-string{color:#fbb6ce}
+
+    /* Status Panel */
+    .status-panel{
+      background:var(--secondary);
+      border-radius:8px;
+      padding:20px;
+      margin-top:20px;
+    }
+
+    .status-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-bottom:10px;
+    }
+
+    .status-label{font-weight:600;color:var(--muted)}
+    .status-value{font-weight:600;color:var(--text)}
+
+    .play-indicator{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .play-led{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--led-color,#ccc);
+      box-shadow:0 0 var(--led-glow,0px) var(--led-color,#ccc);
+      transition:all 0.3s ease;
+    }
+
+    /* Preset Buttons */
+    .preset-buttons{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+      gap:10px;
+      margin-top:15px;
+    }
+
+    .preset-btn{
+      padding:12px 8px;
+      background:var(--surface);
+      border:2px solid var(--border);
+      border-radius:8px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      text-align:center;
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .preset-btn:hover{border-color:var(--primary);background:var(--secondary)}
+
+    .legend{
+      background:var(--surface);
+      border-radius:8px;
+      padding:15px;
+      margin-top:20px;
+      font-size:14px;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    @media (max-width: 768px) {
+      .grid{grid-template-columns:1fr;gap:20px}
+      .header h1{font-size:2rem}
+      .slider-container{grid-template-columns:60px 1fr 60px;gap:10px}
+      .note-buttons{grid-template-columns:repeat(4,1fr)}
+      .preset-buttons{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>蜂鳴器 (Buzzer)</h1>
+    <p>學習Arduino音效控制與聲波原理</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <!-- Buzzer Visual -->
+      <div class="card">
+        <h3>蜂鳴器視覺效果</h3>
+        <div class="buzzer-container" id="buzzerContainer">
+          <div class="frequency-display" id="frequencyDisplay">靜音</div>
+          
+          <div class="sound-waves" id="soundWaves">
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+          </div>
+          
+          <div class="buzzer-housing" id="buzzerHousing">
+            <div class="buzzer-center"></div>
+            <div class="buzzer-pins">
+              <div class="buzzer-pin">
+                <div class="pin-label">+</div>
+              </div>
+              <div class="buzzer-pin">
+                <div class="pin-label">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <div class="status-row">
+            <div class="status-label">播放狀態:</div>
+            <div class="play-indicator">
+              <div class="play-led" id="playLed"></div>
+              <span class="status-value" id="playStatus">停止</span>
+            </div>
+          </div>
+          <div class="status-row">
+            <div class="status-label">頻率:</div>
+            <div class="status-value" id="currentFreq">0 Hz</div>
+          </div>
+          <div class="status-row">
+            <div class="status-label">持續時間:</div>
+            <div class="status-value" id="currentDuration">0 ms</div>
+          </div>
+          <div class="status-row">
+            <div class="status-label">音階:</div>
+            <div class="status-value" id="currentNote">無</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="card">
+        <h3>蜂鳴器控制</h3>
+        <div class="controls">
+          <div class="control-group">
+            <h4>頻率控制 (tone函數)</h4>
+            <div class="slider-container">
+              <div class="slider-label">頻率</div>
+              <input type="range" class="slider" id="frequencySlider" min="100" max="3000" value="440">
+              <input type="number" class="slider-value" id="frequencyValue" min="100" max="3000" value="440">
+            </div>
+            <div class="slider-container">
+              <div class="slider-label">持續時間</div>
+              <input type="range" class="slider" id="durationSlider" min="100" max="2000" value="500">
+              <input type="number" class="slider-value" id="durationValue" min="100" max="2000" value="500">
+            </div>
+            <div class="slider-container">
+              <div class="slider-label">音量</div>
+              <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="30">
+              <input type="number" class="slider-value" id="volumeValue" min="0" max="100" value="30">
+            </div>
+            
+            <div class="arduino-code" id="arduinoCode">
+<span class="code-comment">// Arduino 程式碼</span>
+<span class="code-function">tone</span>(<span class="code-number">8</span>, <span class="code-number" id="codeFreq">440</span>, <span class="code-number" id="codeDuration">500</span>);
+<span class="code-comment">// tone(腳位, 頻率Hz, 持續時間ms)</span>
+            </div>
+            
+            <div style="text-align:center;margin-top:15px">
+              <button class="preset-btn" onclick="playTone()" id="playBtn" style="background:var(--success);color:white;border-color:var(--success)">播放音效</button>
+              <button class="preset-btn" onclick="stopTone()" style="background:var(--danger);color:white;border-color:var(--danger);margin-left:10px">停止音效</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>音階選擇</h4>
+            <div class="note-buttons" id="noteButtons">
+              <div class="note-btn" data-freq="262">
+                <span class="note-name">C</span>
+                <span class="note-freq">262Hz</span>
+              </div>
+              <div class="note-btn" data-freq="294">
+                <span class="note-name">D</span>
+                <span class="note-freq">294Hz</span>
+              </div>
+              <div class="note-btn" data-freq="330">
+                <span class="note-name">E</span>
+                <span class="note-freq">330Hz</span>
+              </div>
+              <div class="note-btn" data-freq="349">
+                <span class="note-name">F</span>
+                <span class="note-freq">349Hz</span>
+              </div>
+              <div class="note-btn" data-freq="392">
+                <span class="note-name">G</span>
+                <span class="note-freq">392Hz</span>
+              </div>
+              <div class="note-btn" data-freq="440">
+                <span class="note-name">A</span>
+                <span class="note-freq">440Hz</span>
+              </div>
+              <div class="note-btn" data-freq="494">
+                <span class="note-name">B</span>
+                <span class="note-freq">494Hz</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>預設音效</h4>
+            <div class="preset-buttons">
+              <div class="preset-btn" onclick="playPreset('beep')">嗶嗶聲</div>
+              <div class="preset-btn" onclick="playPreset('alarm')">警報聲</div>
+              <div class="preset-btn" onclick="playPreset('success')">成功音</div>
+              <div class="preset-btn" onclick="playPreset('error')">錯誤音</div>
+              <div class="preset-btn" onclick="playPreset('startup')">啟動音</div>
+              <div class="preset-btn" onclick="playPreset('click')">點擊音</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend">
+          調整頻率和持續時間控制蜂鳴器，選擇音階或預設音效快速體驗。<br>
+          蜂鳴器透過Arduino的tone()函數控制，產生不同頻率的方波音效。<br>
+          <strong>🔊 注意：首次點擊播放時瀏覽器可能會詢問音效權限，請允許以體驗真實音效。</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Educational Content -->
+    <div class="card" style="margin-top:30px">
+      <h3>蜂鳴器工作原理與Arduino控制</h3>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="control-group">
+          <h4>🔊 蜂鳴器原理</h4>
+          <div style="font-size:14px;line-height:1.5">
+            <p><strong>壓電式蜂鳴器：</strong></p>
+            <p>• 內部有壓電陶瓷片</p>
+            <p>• 通電時陶瓷片震動產生聲音</p>
+            <p>• 頻率決定音調高低</p>
+            <p>• 電壓決定音量大小</p>
+            <br>
+            <p><strong>工作頻率範圍：</strong></p>
+            <p>• 人耳可聽：20Hz - 20kHz</p>
+            <p>• 蜂鳴器適用：100Hz - 5kHz</p>
+            <p>• 最佳響應：1kHz - 3kHz</p>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <h4>🎵 Arduino tone()函數</h4>
+          <div style="font-size:14px;line-height:1.5">
+            <p><strong>函數語法：</strong></p>
+            <div class="arduino-code" style="margin:8px 0">
+<span class="code-function">tone</span>(<span class="code-string">pin</span>, <span class="code-string">frequency</span>);
+<span class="code-function">tone</span>(<span class="code-string">pin</span>, <span class="code-string">frequency</span>, <span class="code-string">duration</span>);
+<span class="code-function">noTone</span>(<span class="code-string">pin</span>);
+            </div>
+            <p><strong>參數說明：</strong></p>
+            <p>• pin: 連接蜂鳴器的數位腳位</p>
+            <p>• frequency: 頻率 (Hz)</p>
+            <p>• duration: 持續時間 (ms，可選)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h4>📊 音階頻率對照表</h4>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;font-size:12px;text-align:center">
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">C (Do)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">D (Re)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">E (Mi)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">F (Fa)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">G (Sol)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">A (La)</div>
+          <div style="font-weight:bold;padding:8px;background:var(--primary);color:white;border-radius:4px">B (Si)</div>
+          
+          <div style="padding:8px;background:var(--surface);border-radius:4px">262 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">294 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">330 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">349 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">392 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">440 Hz</div>
+          <div style="padding:8px;background:var(--surface);border-radius:4px">494 Hz</div>
+        </div>
+      </div>
+
+      <div class="control-group" style="margin-top:20px">
+        <h4>💻 Arduino 完整程式範例</h4>
+        <div class="arduino-code">
+<span class="code-comment">// 蜂鳴器連接到數位腳位8</span>
+<span class="code-function">int</span> <span class="code-string">buzzerPin</span> = <span class="code-number">8</span>;
+
+<span class="code-function">void</span> <span class="code-string">setup</span>() {
+  <span class="code-comment">// 初始化序列埠</span>
+  <span class="code-function">Serial</span>.<span class="code-function">begin</span>(<span class="code-number">9600</span>);
+}
+
+<span class="code-function">void</span> <span class="code-string">loop</span>() {
+  <span class="code-comment">// 播放音階 C-D-E-F-G-A-B</span>
+  <span class="code-function">tone</span>(<span class="code-string">buzzerPin</span>, <span class="code-number">262</span>, <span class="code-number">500</span>); <span class="code-comment">// C</span>
+  <span class="code-function">delay</span>(<span class="code-number">600</span>);
+  <span class="code-function">tone</span>(<span class="code-string">buzzerPin</span>, <span class="code-number">294</span>, <span class="code-number">500</span>); <span class="code-comment">// D</span>
+  <span class="code-function">delay</span>(<span class="code-number">600</span>);
+  <span class="code-function">tone</span>(<span class="code-string">buzzerPin</span>, <span class="code-number">330</span>, <span class="code-number">500</span>); <span class="code-comment">// E</span>
+  <span class="code-function">delay</span>(<span class="code-number">600</span>);
+  
+  <span class="code-comment">// 停止所有音效</span>
+  <span class="code-function">noTone</span>(<span class="code-string">buzzerPin</span>);
+  <span class="code-function">delay</span>(<span class="code-number">2000</span>);
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // Elements
+      const frequencySlider = document.getElementById('frequencySlider');
+      const durationSlider = document.getElementById('durationSlider');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const frequencyValue = document.getElementById('frequencyValue');
+      const durationValue = document.getElementById('durationValue');
+      const volumeValue = document.getElementById('volumeValue');
+      const noteButtons = document.getElementById('noteButtons');
+      const playBtn = document.getElementById('playBtn');
+      
+      const frequencyDisplay = document.getElementById('frequencyDisplay');
+      const currentFreq = document.getElementById('currentFreq');
+      const currentDuration = document.getElementById('currentDuration');
+      const currentNote = document.getElementById('currentNote');
+      const playStatus = document.getElementById('playStatus');
+      const playLed = document.getElementById('playLed');
+      
+      const codeFreq = document.getElementById('codeFreq');
+      const codeDuration = document.getElementById('codeDuration');
+      const soundWaves = document.getElementById('soundWaves');
+
+      // State
+      let currentFrequency = 440;
+      let currentDur = 500;
+      let currentVolume = 30; // 0-100
+      let isPlaying = false;
+      let playTimeout = null;
+      
+      // Web Audio API
+      let audioContext = null;
+      let oscillator = null;
+      let gainNode = null;
+
+      // Musical notes mapping
+      const noteNames = {
+        262: 'C (Do)', 294: 'D (Re)', 330: 'E (Mi)', 349: 'F (Fa)',
+        392: 'G (Sol)', 440: 'A (La)', 494: 'B (Si)'
+      };
+
+      // Preset sounds
+      const presets = {
+        beep: [{freq: 1000, dur: 200}],
+        alarm: [
+          {freq: 800, dur: 300}, {freq: 1200, dur: 300},
+          {freq: 800, dur: 300}, {freq: 1200, dur: 300}
+        ],
+        success: [
+          {freq: 523, dur: 150}, {freq: 659, dur: 150}, {freq: 784, dur: 300}
+        ],
+        error: [
+          {freq: 300, dur: 200}, {freq: 250, dur: 200}, {freq: 200, dur: 400}
+        ],
+        startup: [
+          {freq: 262, dur: 200}, {freq: 330, dur: 200}, {freq: 392, dur: 200}, {freq: 523, dur: 400}
+        ],
+        click: [{freq: 2000, dur: 50}]
+      };
+
+      // Web Audio API functions
+      function initAudio() {
+        if (!audioContext) {
+          try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          } catch (e) {
+            console.warn('Web Audio API not supported');
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function playSound(frequency, duration) {
+        if (!initAudio()) {
+          console.warn('Audio not available');
+          return;
+        }
+
+        // Stop any existing sound
+        stopSound();
+
+        try {
+          // Create oscillator for the tone
+          oscillator = audioContext.createOscillator();
+          gainNode = audioContext.createGain();
+
+          // Configure oscillator (square wave for buzzer-like sound)
+          oscillator.type = 'square';
+          oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+          // Configure gain (volume control) - convert 0-100 to 0-0.3 for safe listening
+          const volume = (currentVolume / 100) * 0.3;
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01); // Quick fade in
+          
+          if (duration > 50) {
+            // Fade out before the end for longer sounds
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime + (duration / 1000) - 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + (duration / 1000));
+          } else {
+            // For very short sounds, just set the end time
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime + (duration / 1000) - 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + (duration / 1000));
+          }
+
+          // Connect nodes
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          // Start and stop
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + (duration / 1000));
+
+          // Clean up when sound ends
+          oscillator.onended = () => {
+            oscillator = null;
+            gainNode = null;
+          };
+
+        } catch (e) {
+          console.warn('Error playing sound:', e);
+        }
+      }
+
+      function stopSound() {
+        try {
+          if (oscillator) {
+            oscillator.stop();
+            oscillator = null;
+          }
+          if (gainNode) {
+            gainNode = null;
+          }
+        } catch (e) {
+          // Ignore errors when stopping
+        }
+      }
+
+      // Helper functions
+      function updateDisplay() {
+        currentFreq.textContent = currentFrequency + ' Hz';
+        currentDuration.textContent = currentDur + ' ms';
+        
+        // Update Arduino code
+        codeFreq.textContent = currentFrequency;
+        codeDuration.textContent = currentDur;
+        
+        // Update note name
+        const noteName = noteNames[currentFrequency] || '自定義';
+        currentNote.textContent = noteName;
+        
+        // Update frequency display
+        if (isPlaying) {
+          frequencyDisplay.textContent = currentFrequency + ' Hz';
+        } else {
+          frequencyDisplay.textContent = '靜音';
+        }
+      }
+
+      function updateVisualEffects() {
+        if (isPlaying) {
+          // Calculate wave speed based on frequency
+          const waveSpeed = Math.max(0.2, Math.min(2, 1200 / currentFrequency));
+          document.documentElement.style.setProperty('--wave-speed', waveSpeed + 's');
+          
+          // Show sound waves
+          soundWaves.style.display = 'block';
+          
+          // Update play indicator
+          playLed.style.setProperty('--led-color', '#28a745');
+          playLed.style.setProperty('--led-glow', '6px');
+          playStatus.textContent = '播放中';
+          
+          // Update play button
+          playBtn.textContent = '播放中...';
+          playBtn.style.background = '#6c757d';
+        } else {
+          // Hide sound waves
+          soundWaves.style.display = 'none';
+          
+          // Update play indicator
+          playLed.style.setProperty('--led-color', '#ccc');
+          playLed.style.setProperty('--led-glow', '0px');
+          playStatus.textContent = '停止';
+          
+          // Update play button
+          playBtn.textContent = '播放音效';
+          playBtn.style.background = 'var(--success)';
+        }
+        
+        updateDisplay();
+      }
+
+      function playTone() {
+        if (isPlaying) return;
+        
+        // Initialize audio on first user interaction
+        if (!audioContext) {
+          initAudio();
+        }
+        
+        isPlaying = true;
+        updateVisualEffects();
+        
+        // Play the actual sound
+        playSound(currentFrequency, currentDur);
+        
+        // Clear any existing timeout
+        if (playTimeout) {
+          clearTimeout(playTimeout);
+        }
+        
+        // Auto stop after duration
+        playTimeout = setTimeout(() => {
+          stopTone();
+        }, currentDur);
+      }
+
+      function stopTone() {
+        isPlaying = false;
+        
+        // Stop the actual sound
+        stopSound();
+        
+        if (playTimeout) {
+          clearTimeout(playTimeout);
+          playTimeout = null;
+        }
+        updateVisualEffects();
+      }
+
+      function playSequence(sequence) {
+        let index = 0;
+        
+        // Initialize audio on first user interaction
+        if (!audioContext) {
+          initAudio();
+        }
+        
+        function playNext() {
+          if (index >= sequence.length) {
+            stopTone();
+            return;
+          }
+          
+          const note = sequence[index];
+          currentFrequency = note.freq;
+          currentDur = note.dur;
+          
+          updateDisplay();
+          isPlaying = true;
+          updateVisualEffects();
+          
+          // Play the actual sound for this note
+          playSound(note.freq, note.dur);
+          
+          setTimeout(() => {
+            index++;
+            if (index < sequence.length) {
+              isPlaying = false;
+              updateVisualEffects();
+              setTimeout(playNext, 50); // Small gap between notes
+            } else {
+              stopTone();
+            }
+          }, note.dur);
+        }
+        
+        playNext();
+      }
+
+      // Event listeners
+      frequencySlider.addEventListener('input', () => {
+        currentFrequency = parseInt(frequencySlider.value);
+        frequencyValue.value = currentFrequency;
+        updateDisplay();
+        
+        // Clear note selection
+        noteButtons.querySelectorAll('.note-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+      });
+
+      frequencyValue.addEventListener('input', () => {
+        currentFrequency = Math.max(100, Math.min(3000, parseInt(frequencyValue.value) || 440));
+        frequencySlider.value = currentFrequency;
+        frequencyValue.value = currentFrequency;
+        updateDisplay();
+        
+        // Clear note selection
+        noteButtons.querySelectorAll('.note-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+      });
+
+      durationSlider.addEventListener('input', () => {
+        currentDur = parseInt(durationSlider.value);
+        durationValue.value = currentDur;
+        updateDisplay();
+      });
+
+      durationValue.addEventListener('input', () => {
+        currentDur = Math.max(100, Math.min(2000, parseInt(durationValue.value) || 500));
+        durationSlider.value = currentDur;
+        durationValue.value = currentDur;
+        updateDisplay();
+      });
+
+      volumeSlider.addEventListener('input', () => {
+        currentVolume = parseInt(volumeSlider.value);
+        volumeValue.value = currentVolume;
+      });
+
+      volumeValue.addEventListener('input', () => {
+        currentVolume = Math.max(0, Math.min(100, parseInt(volumeValue.value) || 30));
+        volumeSlider.value = currentVolume;
+        volumeValue.value = currentVolume;
+      });
+
+      // Note buttons
+      noteButtons.addEventListener('click', (e) => {
+        const btn = e.target.closest('.note-btn');
+        if (!btn) return;
+        
+        const freq = parseInt(btn.dataset.freq);
+        currentFrequency = freq;
+        
+        // Update UI
+        frequencySlider.value = freq;
+        frequencyValue.value = freq;
+        
+        // Update button states
+        noteButtons.querySelectorAll('.note-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        updateDisplay();
+        
+        // Auto play the note
+        playTone();
+      });
+
+      // Global functions
+      window.playTone = playTone;
+      window.stopTone = stopTone;
+      window.playPreset = function(preset) {
+        if (presets[preset]) {
+          playSequence(presets[preset]);
+        }
+      };
+
+      // Initialize
+      updateDisplay();
+      updateVisualEffects();
+    })();
+  </script>
+</body>
+</html>

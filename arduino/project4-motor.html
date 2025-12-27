@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功課四：震動馬達控制 - 電子元件教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --motor: #9C27B0;
+      --motor-dark: #7B1FA2;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .challenge-box {
+      background: linear-gradient(135deg, #9c27b0 0%, #673ab7 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .challenge-box h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .ai-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      border: 2px solid #10A37F;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: #10A37F;
+    }
+
+    .question-template {
+      background: #f0f9ff;
+      border: 1px solid #e0f2fe;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+    }
+
+    .code-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      white-space: pre-wrap;
+      line-height: 1.8;
+    }
+
+    .code-block .string {
+      color: #ffa07a;
+    }
+
+    .code-block .comment {
+      color: #68d391;
+    }
+
+    .code-block .keyword {
+      color: #fbb6ce;
+    }
+
+    .code-block .function {
+      color: #90cdf4;
+    }
+
+    .hint-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .success-box {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .code-section h4 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>🔄 功課四：震動馬達控制</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>⚡ PWM與馬達驅動</h2>
+      <p>學會控制震動馬達，掌握PWM調速和馬達驅動電路技術！</p>
+    </div>
+
+    <div class="challenge-box">
+      <h3>🎯 最終挑戰任務</h3>
+      <p>製作一個整合所有元件的完整系統！結合數碼管、RGB燈、蜂鳴器和震動馬達：</p>
+      <p><strong>按下按鈕 → 蜂鳴器+震動馬達響1秒 → 開始倒數 → 燈光變化 → 完成！</strong></p>
+    </div>
+
+    <div class="ai-section">
+      <div class="ai-header">
+        <span style="font-size: 2rem;">🤖</span>
+        <h3>與ChatGPT協作</h3>
+      </div>
+      
+      <p>你可以試著問ChatGPT這些問題來獲得幫助和完整程式碼：</p>
+      
+      <div class="question-template">
+我想用Arduino製作一個整合多個元件的倒數計時系統。
+
+功能需求：
+1. 按下按鈕時，蜂鳴器和震動馬達同時運作1秒
+2. 提示音結束後開始從9倒數到0
+3. 倒數時數碼管顯示數字
+4. 根據倒數數字顯示不同顏色：
+   - 9~7：藍燈
+   - 6~4：紅燈
+   - 3~0：綠燈
+5. 倒數結束後全部關閉
+
+硬體接線：
+- 按鈕接在接腳2
+- 紅色LED接在接腳3
+- 綠色LED接在接腳4
+- 藍色LED接在接腳5
+- TM1637的DIO接在接腳6
+- TM1637的CLK接在接腳7
+- 震動馬達接在接腳9
+- 蜂鳴器接在接腳11
+
+請幫我寫Arduino程式碼，並加上詳細註解。
+      </div>
+
+      <div class="hint-box">
+        <h4>💡 提問技巧</h4>
+        <ul>
+          <li>說明你要整合哪些元件</li>
+          <li>描述清楚每個元件的功能和時機</li>
+          <li>詢問如何控制震動馬達（digitalWrite vs analogWrite）</li>
+          <li>如果有疑問，可以請ChatGPT分別解釋每個部分</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-section">
+      <h3>📝 程式碼詳細解說</h3>
+      <p>讓我們一步步了解這個完整的整合專案！</p>
+      
+      <h4 style="color: var(--primary); margin-top: 2rem;">📚 第一部分：引入函式庫</h4>
+      <p>繼續使用TM1637數碼管函式庫</p>
+      <div class="code-block">
+<span class="keyword">#include</span> <span class="string">&lt;TM1637Display.h&gt;</span>  <span class="comment">// 數碼管控制函式庫</span>
+        </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🎯 第二部分：腳位定義</h4>
+      <p>這是最完整的專案！我們用到了所有學過的元件</p>
+      <div class="code-block">
+<span class="comment">// --- 腳位定義 ---</span>
+<span class="keyword">const int</span> buttonPin = 2;   <span class="comment">// 按鈕接在2號接腳</span>
+<span class="keyword">const int</span> redPin = 3;      <span class="comment">// 紅燈接在3號接腳</span>
+<span class="keyword">const int</span> greenPin = 4;    <span class="comment">// 綠燈接在4號接腳</span>
+<span class="keyword">const int</span> bluePin = 5;     <span class="comment">// 藍燈接在5號接腳</span>
+<span class="keyword">const int</span> DIO = 6;         <span class="comment">// 數碼管資料線</span>
+<span class="keyword">const int</span> CLK = 7;         <span class="comment">// 數碼管時鐘線</span>
+<span class="keyword">const int</span> motorPin = 9;    <span class="comment">// 🔄 震動馬達接在9號接腳</span>
+<span class="keyword">const int</span> buzzerPin = 11;  <span class="comment">// 🔔 蜂鳴器接在11號接腳</span>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🎨 第三部分：建立物件和變數</h4>
+      <p>建立數碼管控制器和狀態變數</p>
+      <div class="code-block">
+<span class="comment">// --- 數碼管物件 ---</span>
+TM1637Display display(CLK, DIO);
+
+<span class="comment">// --- 狀態變數 ---</span>
+<span class="keyword">int</span> lastButtonState = HIGH;  <span class="comment">// 上一次按鈕狀態</span>
+<span class="keyword">bool</span> counting = false;        <span class="comment">// 是否正在倒數</span>
+<span class="keyword">int</span> counter = 9;              <span class="comment">// 倒數從9開始</span>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">⚙️ 第四部分：setup 開機設定</h4>
+      <p>設定所有接腳，這次多了震動馬達！</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  pinMode(buttonPin, INPUT_PULLUP);  <span class="comment">// 按鈕設為輸入</span>
+  pinMode(redPin, OUTPUT);            <span class="comment">// 紅燈設為輸出</span>
+  pinMode(greenPin, OUTPUT);          <span class="comment">// 綠燈設為輸出</span>
+  pinMode(bluePin, OUTPUT);           <span class="comment">// 藍燈設為輸出</span>
+  pinMode(motorPin, OUTPUT);          <span class="comment">// 🔄 震動馬達設為輸出</span>
+  pinMode(buzzerPin, OUTPUT);         <span class="comment">// 🔔 蜂鳴器設為輸出</span>
+
+  display.setBrightness(7);
+  display.showNumberDec(0);
+  <span class="function">allOff</span>();
+
+  Serial.begin(9600);
+  Serial.println(<span class="string">"系統準備好了～ 按下按鈕開始倒數！"</span>);
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🔄 第五部分：loop 主要迴圈</h4>
+      <p>按下按鈕時，蜂鳴器和震動馬達會同時運作1秒！</p>
+      <div class="code-block">
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">int</span> buttonState = digitalRead(buttonPin);
+
+  <span class="comment">// 偵測按下事件（HIGH → LOW）</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    <span class="keyword">if</span> (!counting) {
+      counting = true;
+      counter = 9;
+
+      <span class="comment">// 🔊🔄 蜂鳴器與震動馬達同步運作 1 秒</span>
+      tone(buzzerPin, 1000);           <span class="comment">// 蜂鳴器發出1000Hz音調</span>
+      digitalWrite(motorPin, HIGH);    <span class="comment">// 震動馬達開始震動</span>
+      delay(1000);                     <span class="comment">// 等待1秒</span>
+      noTone(buzzerPin);               <span class="comment">// 停止蜂鳴器</span>
+      digitalWrite(motorPin, LOW);     <span class="comment">// 停止震動馬達</span>
+
+      Serial.println(<span class="string">"開始倒數！"</span>);
+      <span class="function">startCountdown</span>();
+    }
+  }
+
+  lastButtonState = buttonState;
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🔄 什麼是震動馬達？</h4>
+      <div class="hint-box">
+        <p><strong>⚡ 震動馬達的原理</strong></p>
+        <p>震動馬達就是一個小型馬達，軸上裝了一個偏心的重物。當馬達轉動時，這個偏心重物會造成不平衡，產生震動效果！</p>
+        <p><strong>💡 手機的震動就是這樣來的！</strong></p>
+        <ul>
+          <li><code>digitalWrite(motorPin, HIGH)</code> - 打開馬達，開始震動</li>
+          <li><code>digitalWrite(motorPin, LOW)</code> - 關閉馬達，停止震動</li>
+          <li>也可以用 <code>analogWrite(motorPin, 速度)</code> 控制震動強度（0~255）</li>
+          </ul>
+        <p><strong>🎮 應用場景：</strong></p>
+        <ul>
+          <li>遊戲手把的震動回饋</li>
+          <li>手機來電震動</li>
+          <li>提醒裝置（例如手環）</li>
+          <li>觸覺反饋系統</li>
+          </ul>
+        </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">⏱️ 第六部分：倒數函式</h4>
+      <p>執行倒數，控制數碼管和燈光</p>
+      <div class="code-block">
+<span class="comment">// --- 倒數函式 ---</span>
+<span class="keyword">void</span> <span class="function">startCountdown</span>() {
+  <span class="keyword">for</span> (<span class="keyword">int</span> i = counter; i >= 0; i--) {
+    display.showNumberDec(i, false);  <span class="comment">// 顯示數字</span>
+
+    <span class="keyword">if</span> (i > 6) {
+      <span class="function">setColor</span>(0, 0, 1);  <span class="comment">// 9,8,7 → 藍燈</span>
+    } <span class="keyword">else if</span> (i > 3) {
+      <span class="function">setColor</span>(1, 0, 0);  <span class="comment">// 6,5,4 → 紅燈</span>
+    } <span class="keyword">else</span> {
+      <span class="function">setColor</span>(0, 1, 0);  <span class="comment">// 3,2,1,0 → 綠燈</span>
+    }
+
+    delay(1000);
+  }
+
+  <span class="comment">// 倒數結束</span>
+  <span class="function">allOff</span>();
+  display.showNumberDec(0);
+  Serial.println(<span class="string">"倒數結束！"</span>);
+  counting = false;
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">💡 第七部分：輔助函式</h4>
+      <p>控制RGB燈光的函式</p>
+      <div class="code-block">
+<span class="comment">// --- 控制RGB燈 ---</span>
+<span class="keyword">void</span> <span class="function">setColor</span>(<span class="keyword">int</span> r, <span class="keyword">int</span> g, <span class="keyword">int</span> b) {
+  digitalWrite(redPin, r);
+  digitalWrite(greenPin, g);
+  digitalWrite(bluePin, b);
+}
+
+<span class="comment">// --- 關燈 ---</span>
+<span class="keyword">void</span> <span class="function">allOff</span>() {
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+}
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">🧠 完整系統運作流程</h4>
+      <div class="hint-box">
+        <p><strong>想像你在體驗一個完整的計時系統：</strong></p>
+        <ol>
+          <li>🎮 <strong>按下按鈕</strong>：系統啟動！</li>
+          <li>🔔🔄 <strong>蜂鳴器+震動馬達</strong>：雙重提示音，告訴你「我準備好了！」（1秒）</li>
+          <li>🔢 <strong>數碼管倒數</strong>：從9倒數到0，每秒顯示一個數字</li>
+          <li>🚦 <strong>燈光變化</strong>：
+            <ul>
+              <li>藍燈（9~7）：冷靜的開始</li>
+              <li>紅燈（6~4）：注意！時間過半</li>
+              <li>綠燈（3~0）：最後衝刺</li>
+            </ul>
+          </li>
+          <li>🏁 <strong>倒數結束</strong>：所有東西關閉，系統回到待命狀態</li>
+        </ol>
+        <p><strong>💡 為什麼要同時用蜂鳴器和震動馬達？</strong><br>
+        這叫做「多感官反饋」！聲音+震動可以讓使用者更清楚地感受到系統的狀態變化，就像手機來訊息時會震動+響鈴一樣！</p>
+        <p><strong>🎯 這個專案整合了你學過的所有技能：</strong></p>
+        <ul>
+          <li>✅ 按鈕輸入控制</li>
+          <li>✅ RGB LED 燈光效果</li>
+          <li>✅ TM1637 數碼管顯示</li>
+          <li>✅ tone() 蜂鳴器音效</li>
+          <li>✅ digitalWrite() 馬達控制</li>
+          <li>✅ 狀態機邏輯設計</li>
+          <li>✅ 多元件協同運作</li>
+          </ul>
+    </div>
+
+      <h4 style="color: var(--primary); margin-top: 2rem;">📋 完整程式碼</h4>
+      <details>
+        <summary style="cursor: pointer; font-weight: bold; color: var(--primary); background: var(--background); padding: 1rem; border-radius: 5px;">點擊展開完整程式碼</summary>
+        
+        <div class="code-block" style="margin-top: 1rem;">
+<span class="keyword">#include</span> <span class="string">&lt;TM1637Display.h&gt;</span>
+
+<span class="comment">// --- 腳位定義 ---</span>
+<span class="keyword">const int</span> buttonPin = 2;
+<span class="keyword">const int</span> redPin = 3;
+<span class="keyword">const int</span> greenPin = 4;
+<span class="keyword">const int</span> bluePin = 5;
+<span class="keyword">const int</span> DIO = 6;
+<span class="keyword">const int</span> CLK = 7;
+<span class="keyword">const int</span> motorPin = 9;
+<span class="keyword">const int</span> buzzerPin = 11;
+
+<span class="comment">// --- 數碼管物件 ---</span>
+TM1637Display display(CLK, DIO);
+
+<span class="comment">// --- 狀態變數 ---</span>
+<span class="keyword">int</span> lastButtonState = HIGH;
+<span class="keyword">bool</span> counting = false;
+<span class="keyword">int</span> counter = 9;
+
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  
+  display.setBrightness(7);
+  display.showNumberDec(0);
+  <span class="function">allOff</span>();
+  
+  Serial.begin(9600);
+  Serial.println(<span class="string">"系統準備好了～ 按下按鈕開始倒數！"</span>);
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">int</span> buttonState = digitalRead(buttonPin);
+
+  <span class="comment">// 偵測按下事件（HIGH → LOW）</span>
+  <span class="keyword">if</span> (buttonState == LOW && lastButtonState == HIGH) {
+    <span class="keyword">if</span> (!counting) {
+      counting = true;
+      counter = 9;
+
+      <span class="comment">// 🔊🔄 蜂鳴器與震動馬達同步運作 1 秒</span>
+      tone(buzzerPin, 1000);
+      digitalWrite(motorPin, HIGH);
+      delay(1000);
+      noTone(buzzerPin);
+      digitalWrite(motorPin, LOW);
+
+      Serial.println(<span class="string">"開始倒數！"</span>);
+      <span class="function">startCountdown</span>();
+    }
+  }
+
+  lastButtonState = buttonState;
+}
+
+<span class="comment">// --- 倒數函式 ---</span>
+<span class="keyword">void</span> <span class="function">startCountdown</span>() {
+  <span class="keyword">for</span> (<span class="keyword">int</span> i = counter; i >= 0; i--) {
+    display.showNumberDec(i, false);
+
+    <span class="keyword">if</span> (i > 6) {
+      <span class="function">setColor</span>(0, 0, 1);  <span class="comment">// 藍燈</span>
+    } <span class="keyword">else if</span> (i > 3) {
+      <span class="function">setColor</span>(1, 0, 0);  <span class="comment">// 紅燈</span>
+    } <span class="keyword">else</span> {
+      <span class="function">setColor</span>(0, 1, 0);  <span class="comment">// 綠燈</span>
+    }
+
+    delay(1000);
+  }
+
+  <span class="comment">// 倒數結束</span>
+  <span class="function">allOff</span>();
+  display.showNumberDec(0);
+  Serial.println(<span class="string">"倒數結束！"</span>);
+  counting = false;
+}
+
+<span class="comment">// --- 控制RGB燈 ---</span>
+<span class="keyword">void</span> <span class="function">setColor</span>(<span class="keyword">int</span> r, <span class="keyword">int</span> g, <span class="keyword">int</span> b) {
+  digitalWrite(redPin, r);
+  digitalWrite(greenPin, g);
+  digitalWrite(bluePin, b);
+}
+
+<span class="comment">// --- 關燈 ---</span>
+<span class="keyword">void</span> <span class="function">allOff</span>() {
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+}
+        </div>
+      </details>
+    </div>
+
+    <div class="success-box">
+      <h4>🎉 完成所有Arduino功課！</h4>
+      <p>恭喜你完成了最終的整合專案！現在你學會了：</p>
+      <ul>
+        <li>✅ 如何控制震動馬達（digitalWrite）</li>
+        <li>✅ 如何同時控制多個元件（蜂鳴器+馬達）</li>
+        <li>✅ 多感官反饋設計（聲音+震動）</li>
+        <li>✅ 完整系統整合與協調</li>
+        <li>✅ 學會從簡單到複雜的專案開發流程</li>
+      </ul>
+      <p><strong>🎓 你已經完成的學習路程：</strong></p>
+      <ul>
+        <li>✅ Arduino IDE安裝與使用</li>
+        <li>✅ 接腳原理與電路基礎</li>
+        <li>✅ ChatGPT協作程式設計</li>
+        <li>✅ <strong>功課一</strong>：RGB LED顏色控制</li>
+        <li>✅ <strong>功課二</strong>：數碼管顯示與倒數</li>
+        <li>✅ <strong>功課三</strong>：蜂鳴器音效控制</li>
+        <li>✅ <strong>功課四</strong>：震動馬達與完整整合</li>
+      </ul>
+      <p><strong>🚀 下一步挑戰：</strong></p>
+      <ul>
+        <li>試著改變倒數的時間長度（例如從30秒倒數）</li>
+        <li>在倒數的每個數字時加入短促的震動提示</li>
+        <li>請ChatGPT教你如何加入感測器（溫度、光線、距離）</li>
+        <li>探索無線通訊（藍牙、WiFi）連接手機App</li>
+        <li>製作自己的創意專案！</li>
+      </ul>
+    </div>
+
+    <div class="navigation">
+      <a href="project3-buzzer.html" class="nav-btn">⬅️ 上一個功課：蜂鳴器控制</a>
+      <a href="../index.html" class="nav-btn">🎉 返回首頁慶祝 ➡️</a>
+    </div>
+  </div>
+</body>
+</html>

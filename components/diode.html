@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二極體 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.2rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1000px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border);margin-bottom:20px}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600;text-align:center}
+
+    /* 二極體展示區域 */
+    .diode-demo{
+      background:linear-gradient(145deg, #f8f9fa, #e9ecef);
+      border-radius:12px;
+      padding:40px;
+      text-align:center;
+      min-height:400px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border:2px solid #ddd;
+      position:relative;
+    }
+
+    /* 電子元件展示區 */
+    .components-showcase{
+      width:100%;
+      max-width:700px;
+      margin:20px auto;
+      background:white;
+      border:2px solid #ddd;
+      border-radius:15px;
+      padding:40px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* 電池元件 */
+    .component-battery{
+      width:120px;
+      height:80px;
+      background:linear-gradient(145deg, var(--battery-color, #ff6b35), #e55a2b);
+      border-radius:12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:bold;
+      font-size:16px;
+      transition:all 0.3s ease;
+      box-shadow:0 4px 8px rgba(0,0,0,0.3);
+      position:relative;
+      cursor:pointer;
+    }
+
+    .component-battery::after{
+      content:'';
+      position:absolute;
+      top:25px;
+      right:-12px;
+      width:12px;
+      height:30px;
+      background:linear-gradient(145deg, var(--battery-color, #ff6b35), #e55a2b);
+      border-radius:0 6px 6px 0;
+    }
+
+    .component-battery:hover{
+      transform:translateY(-3px);
+      box-shadow:0 8px 15px rgba(0,0,0,0.4);
+    }
+
+    /* LED元件 */
+    .component-led{
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      background:var(--led-bg, #666);
+      border:4px solid #333;
+      transition:all 0.5s ease;
+      box-shadow:0 0 var(--led-glow, 0px) var(--led-color, transparent);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      cursor:pointer;
+    }
+
+    .component-led.on{
+      --led-bg:#ffeb3b;
+      --led-glow:30px;
+      --led-color:#ffeb3b;
+      animation:led-pulse-new 2s ease-in-out infinite alternate;
+    }
+
+    .component-led.off{
+      --led-bg:#666;
+      --led-glow:0px;
+    }
+
+    .component-led:hover{
+      transform:scale(1.05);
+    }
+
+    @keyframes led-pulse-new{
+      from{ 
+        box-shadow:0 0 30px #ffeb3b; 
+        filter:brightness(1);
+      }
+      to{ 
+        box-shadow:0 0 50px #ffeb3b, 0 0 70px #ffeb3b; 
+        filter:brightness(1.3);
+      }
+    }
+
+    /* LED引腳 */
+    .led-pins{
+      position:absolute;
+      bottom:-20px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:30px;
+    }
+
+    .led-pin{
+      width:4px;
+      height:20px;
+      background:linear-gradient(180deg, #ffd700, #daa520);
+      border-radius:2px;
+    }
+
+    .led-pin.long{
+      height:25px;
+    }
+
+    /* 二極體元件 */
+    .component-diode{
+      width:140px;
+      height:50px;
+      background:linear-gradient(145deg, #2c2c2c, #1a1a1a);
+      border-radius:25px;
+      position:relative;
+      box-shadow:0 4px 8px rgba(0,0,0,0.4);
+      border:3px solid #555;
+      transition:all 0.5s ease;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .component-diode:hover{
+      transform:scale(1.05);
+      box-shadow:0 6px 12px rgba(0,0,0,0.5);
+    }
+
+    /* 陰極標示環（銀色環） */
+    .diode-cathode-ring{
+      position:absolute;
+      right:18px;
+      top:4px;
+      bottom:4px;
+      width:8px;
+      background:linear-gradient(145deg, #e8e8e8, #bbb);
+      border-radius:4px;
+      transition:all 0.5s ease;
+    }
+
+    /* 二極體方向反轉 */
+    .component-diode.reversed{
+      transform:scaleX(-1);
+    }
+
+    .component-diode.reversed:hover{
+      transform:scaleX(-1) scale(1.05);
+    }
+
+    /* 二極體符號 */
+    .diode-symbol{
+      font-size:28px;
+      font-weight:bold;
+      color:#fff;
+      text-shadow:0 2px 4px rgba(0,0,0,0.7);
+      user-select:none;
+    }
+
+    /* 二極體引腳 */
+    .diode-pins{
+      position:absolute;
+      bottom:-20px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      justify-content:space-between;
+      width:160px;
+    }
+
+    .diode-pin{
+      width:4px;
+      height:20px;
+      background:linear-gradient(180deg, #ffd700, #daa520);
+      border-radius:2px;
+    }
+
+    /* 元件排列 */
+    .components-grid{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:40px;
+      padding:20px 0;
+    }
+
+    .components-row{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:50px;
+      flex-wrap:wrap;
+    }
+
+    .component-container{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:15px;
+      position:relative;
+    }
+
+    .component-label{
+      font-size:16px;
+      font-weight:bold;
+      color:var(--primary);
+      background:rgba(255,255,255,0.95);
+      padding:8px 16px;
+      border-radius:20px;
+      border:2px solid var(--primary);
+      box-shadow:0 3px 6px rgba(0,0,0,0.1);
+      min-width:80px;
+      text-align:center;
+      white-space:nowrap;
+    }
+
+    /* 流動箭頭 */
+    .flow-arrow{
+      font-size:40px;
+      color:var(--success);
+      animation:flow-bounce 1.5s ease-in-out infinite;
+      transition:all 0.3s ease;
+      opacity:0;
+    }
+
+    .flow-arrow.active{
+      opacity:1;
+    }
+
+    .flow-arrow.blocked{
+      color:var(--danger);
+      animation:none;
+    }
+
+    @keyframes flow-bounce{
+      0%, 100%{ transform:scale(1); opacity:0.8; }
+      50%{ transform:scale(1.2); opacity:1; }
+    }
+
+    /* 移除舊標籤樣式 */
+
+    /* 二極體外觀 */
+    .diode-visual{
+      position:relative;
+      margin:20px 0;
+    }
+
+    .diode-body{
+      width:120px;
+      height:40px;
+      background:linear-gradient(145deg, #2c2c2c, #1a1a1a);
+      border-radius:20px;
+      position:relative;
+      box-shadow:0 4px 8px rgba(0,0,0,0.3);
+      border:2px solid #555;
+      margin:0 auto;
+    }
+
+    /* 陰極標示環（銀色環） */
+    .cathode-ring{
+      position:absolute;
+      right:15px;
+      top:3px;
+      bottom:3px;
+      width:6px;
+      background:linear-gradient(145deg, #e8e8e8, #bbb);
+      border-radius:3px;
+    }
+
+    /* 二極體引腳 */
+    .diode-pins{
+      display:flex;
+      justify-content:space-between;
+      width:200px;
+      margin:10px auto;
+    }
+
+    .pin{
+      width:40px;
+      height:4px;
+      background:linear-gradient(90deg, #ffd700, #daa520);
+      border-radius:2px;
+    }
+
+    /* 標籤 */
+    .pin-labels{
+      display:flex;
+      justify-content:space-between;
+      width:200px;
+      margin:5px auto 0;
+      font-size:14px;
+      font-weight:bold;
+    }
+
+    .anode-label{color:var(--danger)}
+    .cathode-label{color:var(--primary)}
+
+    /* 電流方向箭頭 */
+    .current-arrow{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      font-size:24px;
+      color:var(--success);
+      opacity:0;
+      transition:all 0.5s ease;
+    }
+
+    .current-arrow.active{
+      opacity:1;
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+
+    .current-arrow.blocked{
+      color:var(--danger);
+      opacity:1;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform:translate(-50%, -50%) scale(1); }
+      50% { transform:translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* 狀態顯示 */
+    .status-display{
+      margin:20px 0;
+      padding:15px;
+      border-radius:8px;
+      font-size:18px;
+      font-weight:bold;
+      text-align:center;
+      transition:all 0.3s ease;
+    }
+
+    .status-display.conducting{
+      background:var(--success);
+      color:white;
+    }
+
+    .status-display.blocking{
+      background:var(--danger);
+      color:white;
+    }
+
+    /* 控制按鈕 */
+    .controls{
+      text-align:center;
+      margin:30px 0;
+    }
+
+    .control-group{
+      margin-bottom:25px;
+    }
+
+    .control-title{
+      font-size:18px;
+      font-weight:bold;
+      margin-bottom:15px;
+      color:var(--primary);
+    }
+
+    .button-group{
+      display:flex;
+      justify-content:center;
+      gap:15px;
+      flex-wrap:wrap;
+    }
+
+    .control-btn{
+      padding:15px 25px;
+      font-size:16px;
+      font-weight:bold;
+      border:3px solid var(--border);
+      border-radius:10px;
+      background:white;
+      color:var(--text);
+      cursor:pointer;
+      transition:all 0.3s ease;
+      min-width:120px;
+    }
+
+    .control-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .control-btn.active{
+      background:var(--primary);
+      color:white;
+      border-color:var(--primary);
+    }
+
+    .control-btn.forward{
+      border-color:var(--success);
+    }
+
+    .control-btn.forward.active{
+      background:var(--success);
+      border-color:var(--success);
+    }
+
+    .control-btn.reverse{
+      border-color:var(--danger);
+    }
+
+    .control-btn.reverse.active{
+      background:var(--danger);
+      border-color:var(--danger);
+    }
+
+    .control-btn.reset{
+      border-color:#6c757d;
+    }
+
+    .control-btn.reset.active{
+      background:#6c757d;
+      border-color:#6c757d;
+    }
+
+    /* 說明區域 */
+    .explanation{
+      background:var(--secondary);
+      border-radius:10px;
+      padding:20px;
+      margin:20px 0;
+      border-left:5px solid var(--primary);
+    }
+
+    .explanation h4{
+      color:var(--primary);
+      margin-bottom:10px;
+      font-size:16px;
+    }
+
+    .explanation p{
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    /* 簡單應用示例 */
+    .simple-apps{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:20px;
+      margin:20px 0;
+    }
+
+    .app-item{
+      background:white;
+      border:2px solid var(--border);
+      border-radius:10px;
+      padding:20px;
+      text-align:center;
+      transition:all 0.3s ease;
+    }
+
+    .app-item:hover{
+      border-color:var(--primary);
+      transform:translateY(-2px);
+    }
+
+    .app-icon{
+      font-size:3rem;
+      margin-bottom:10px;
+    }
+
+    .app-title{
+      font-weight:bold;
+      color:var(--primary);
+      margin-bottom:8px;
+    }
+
+    .app-desc{
+      font-size:14px;
+      color:#666;
+    }
+
+    /* SVG 電路圖（統一與其它頁一致的繪製方式） */
+    .schematic{width:100%;max-width:520px;display:block;margin:0 auto}
+    .wire{stroke:#2b2d42;stroke-width:4;fill:none;stroke-linecap:round}
+    .label{font:600 18px/1.2 sans-serif;fill:#263238}
+    .lamp-bulb{fill:#B0BEC5;stroke:#607D8B;stroke-width:2}
+    .lamp-bulb.on{fill:#FFD54F}
+    .diode-tri{fill:#546E7A}
+    .diode-bar{fill:#263238}
+    .panel{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px}
+    .panel h4{font-size:20px}
+
+    @media (max-width: 768px) {
+      .header h1{font-size:2rem}
+      .button-group{flex-direction:column;align-items:center}
+      .simple-apps{grid-template-columns:1fr}
+      .diode-demo{padding:15px;min-height:320px}
+      
+      /* 手機版電路圖調整 */
+      .simple-circuit{
+        max-width:100%;
+        height:220px;
+        padding:15px;
+      }
+      
+      .battery{
+        width:50px;
+        height:45px;
+        font-size:9px;
+        left:15px;
+        top:50%;
+        transform:translateY(-50%);
+      }
+      
+      .battery::after{
+        width:6px;
+        height:15px;
+        top:15px;
+      }
+      
+      .led{
+        width:35px;
+        height:35px;
+        right:30px;
+        top:25px;
+      }
+      
+      .led-label{
+        font-size:9px;
+        padding:1px 3px;
+      }
+      
+      .led-label.positive{
+        top:25px;
+        right:2px;
+      }
+      
+      .led-label.negative{
+        top:40px;
+        right:2px;
+      }
+      
+      .diode{
+        width:50px;
+        height:20px;
+        top:35px;
+      }
+      
+      .label{
+        font-size:9px;
+        padding:1px 3px;
+      }
+      
+      .label-led{
+        right:25px;
+      }
+      
+      /* 調整連接線 */
+      .wire1{
+        top:47px;
+        left:71px;
+        width:90px;
+      }
+      
+      .wire2{
+        top:47px;
+        left:200px;
+        width:60px;
+      }
+      
+      .wire3{
+        top:60px;
+        right:52px;
+        height:85px;
+      }
+      
+      .wire4{
+        bottom:40px;
+        left:40px;
+        right:52px;
+      }
+      
+      .wire5{
+        top:80px;
+        left:40px;
+        height:65px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>二極體 🔋</h1>
+    <p>電流的單行道 - 只能往一個方向流！</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- 主要展示區域 -->
+    <div class="card">
+      <h3>LED電路實驗 💡</h3>
+      <div class="diode-demo">
+        <!-- SVG 電路互動示意（固定座標） -->
+        <div class="panel" style="width:100%;max-width:760px;">
+          <svg id="diodeSvg" viewBox="0 0 760 260" class="schematic" aria-label="二極體LED互動">
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- 回路矩形 -->
+            <polyline class="wire" points="80,40 680,40 680,200 80,200 80,40"/>
+            <!-- 電池（圖示+極性文字） -->
+            <text x="62" y="112" class="label" style="font-size:24px">🔋</text>
+            <text x="120" y="62" class="label">正極</text>
+            <text x="120" y="198" class="label">負極</text>
+
+            <!-- 二極體（中間，三角+直線） -->
+            <!-- 二極體符號貼齊上方導線（沿 y=40 中心上下各20） -->
+            <g id="diodeGroup" transform="translate(300,0)">
+              <polygon class="diode-tri" points="0,20 60,40 0,60"/>
+              <rect class="diode-bar" x="62" y="30" width="10" height="20"/>
+            </g>
+            <!-- LED 圓燈 -->
+            <circle id="ledBulb" cx="680" cy="120" r="18" class="lamp-bulb"/>
+            <line class="wire" x1="680" y1="40" x2="680" y2="102"/>
+            <line class="wire" x1="680" y1="138" x2="680" y2="200"/>
+
+            <!-- 電流動畫路徑 -->
+            <path id="pathUpper" d="M 80 40 H 680" fill="none"/>
+            <path id="pathRight" d="M 680 40 V 200" fill="none"/>
+            <path id="pathBottom" d="M 680 200 H 80" fill="none"/>
+            <path id="pathLeft" d="M 80 200 V 40" fill="none"/>
+
+            <!-- 流動小點（顯示/隱藏切換） -->
+            <circle id="dot1" r="5" fill="#00e676" style="display:none">
+              <animateMotion id="anim1" dur="2s" repeatCount="indefinite"><mpath href="#pathUpper"/></animateMotion>
+            </circle>
+            <circle id="dot3" r="5" fill="#00e676" style="display:none">
+              <animateMotion id="anim3" dur="2s" repeatCount="indefinite"><mpath href="#pathRight"/></animateMotion>
+            </circle>
+            <circle id="dot4" r="5" fill="#00e676" style="display:none">
+              <animateMotion id="anim4" dur="2.5s" repeatCount="indefinite"><mpath href="#pathBottom"/></animateMotion>
+            </circle>
+            <circle id="dot5" r="5" fill="#00e676" style="display:none">
+              <animateMotion id="anim5" dur="2s" repeatCount="indefinite"><mpath href="#pathLeft"/></animateMotion>
+            </circle>
+          </svg>
+        </div>
+
+        <!-- 狀態顯示 -->
+        <div class="status-display" id="statusDisplay">
+          點擊下方按鈕試試看二極體的神奇效果！
+        </div>
+      </div>
+    </div>
+
+    <!-- 控制區域 -->
+    <div class="card">
+      <h3>🔋 試試看不同的接法！</h3>
+      <div class="controls">
+        <div class="control-group">
+          <div class="control-title">電池接到二極體的不同方式</div>
+          <div class="button-group">
+            <button class="control-btn forward" onclick="testDirection('forward')">
+              🟢 正向接法<br><small>電池(+) → 陽極 → 陰極 → LED → 電池(-)</small>
+            </button>
+            <button class="control-btn reverse" onclick="testDirection('reverse')">
+              🔴 反向接法<br><small>電池(+) → 陰極 → 陽極 → LED → 電池(-)</small>
+            </button>
+            <button class="control-btn reset" onclick="resetCircuit()">
+              ⚪ 重置電路<br><small>回到初始狀態</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 說明區域 -->
+    <div class="card">
+      <h3>二極體的工作原理</h3>
+      
+      <div class="explanation">
+        <h4>🚦 二極體就像單行道</h4>
+        <p>
+          二極體只允許電流往一個方向流動！<br>
+          <strong>🟢 正向接法：</strong>電流順利通過，LED燈會亮 ✨<br>
+          <strong>🔴 反向接法：</strong>電流被阻擋，LED燈不會亮 ❌
+        </p>
+      </div>
+
+      <div class="explanation">
+        <h4>🔍 如何辨認二極體？</h4>
+        <p>
+          二極體上有一條<strong>銀色的環</strong>，那一邊是<span style="color:var(--primary)">陰極 (-)</span>。<br>
+          沒有環的那一邊是<span style="color:var(--danger)">陽極 (+)</span>。
+        </p>
+      </div>
+
+      <!-- （依使用者需求）刪除「二極體在電路中的應用」SVG 區塊 -->
+  </div>
+
+  <script>
+    (() => {
+      // 獲取所有元素
+      const statusDisplay = document.getElementById('statusDisplay');
+      const controlButtons = document.querySelectorAll('.control-btn');
+      // SVG 元件
+      const ledBulb = document.getElementById('ledBulb');
+      const diodeGroup = document.getElementById('diodeGroup');
+      const dots = [
+        document.getElementById('dot1'),
+        document.getElementById('dot2'),
+        document.getElementById('dot3'),
+        document.getElementById('dot4'),
+        document.getElementById('dot5')
+      ];
+
+      let currentState = 'initial';
+
+      // 測試電流方向
+      window.testDirection = function(direction) {
+        // 重置所有按鈕
+        controlButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // 啟用選中的按鈕
+        const selectedBtn = document.querySelector(`.control-btn.${direction}`);
+        if (selectedBtn) {
+          selectedBtn.classList.add('active');
+        }
+        
+        currentState = direction;
+        updateCircuit();
+      };
+
+      // 重置電路
+      window.resetCircuit = function() {
+        controlButtons.forEach(btn => btn.classList.remove('active'));
+        currentState = 'initial';
+        updateCircuit();
+      };
+
+      // 更新電路狀態
+      function updateCircuit() {
+        if (currentState === 'forward') {
+          // 正向接法 - 電流通過
+          // 二極體正向（貼齊上方導線）
+          diodeGroup.setAttribute('transform', 'translate(300,0)');
+          // LED 亮 + 光暈
+          ledBulb.classList.add('on');
+          ledBulb.setAttribute('filter','url(#glow)');
+          // 顯示流動小點
+          dots.forEach(d=> d.style.display='');
+          
+          // 更新狀態顯示
+          statusDisplay.className = 'status-display conducting';
+          statusDisplay.innerHTML = '✅ 電流通過！LED燈亮了！<br>🟢 正向接法：電池(+) → 二極體陽極 → 陰極 → LED(+) → LED(-) → 電池(-)';
+          
+        } else if (currentState === 'reverse') {
+          // 反向接法 - 電流被阻斷
+          // 二極體反向（左右翻轉符號位置）
+          diodeGroup.setAttribute('transform', 'translate(300,0) scale(-1,1) translate(-72,0)');
+          // LED 熄滅
+          ledBulb.classList.remove('on');
+          ledBulb.removeAttribute('filter');
+          // 隱藏流動小點
+          dots.forEach(d=> d.style.display='none');
+          
+          // 更新狀態顯示
+          statusDisplay.className = 'status-display blocking';
+          statusDisplay.innerHTML = '❌ 電流被阻斷！LED燈不亮！<br>🔴 反向接法：電池(+) → 二極體陰極 ⚡ 陽極 (電流無法通過)';
+          
+        } else {
+          // 初始狀態
+          diodeGroup.setAttribute('transform', 'translate(300,0)');
+          ledBulb.classList.remove('on');
+          ledBulb.removeAttribute('filter');
+          dots.forEach(d=> d.style.display='none');
+          
+          // 初始狀態顯示
+          statusDisplay.className = 'status-display';
+          statusDisplay.textContent = '點擊下方按鈕試試看二極體的神奇效果！';
+        }
+      }
+
+      // 初始化
+      updateCircuit();
+
+      // 提示文字（移除動畫效果）
+      setTimeout(() => {
+        if (currentState === 'initial') {
+          statusDisplay.innerHTML = '🌟 試試點擊「正向接法」按鈕！';
+        }
+      }, 2000);
+    })();
+  </script>
+</body>
+</html>

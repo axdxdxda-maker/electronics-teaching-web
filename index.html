@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>電子元件互動教學 | 首頁</title>
+  <style>
+    :root {
+      /* 創客DIY風格色彩 - 白色主題 */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-gradient: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(226, 232, 240, 0.8);
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      
+      /* 創新科技色彩 */
+      --accent-cyber: #00d4ff;
+      --accent-neon: #39ff14;
+      --accent-electric: #ff6b35;
+      --accent-maker: #ff9500;
+      --accent-purple: #8b5cf6;
+      
+      /* 互動效果 */
+      --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+      --glow-green: 0 0 20px rgba(57, 255, 20, 0.3);
+      --glow-orange: 0 0 20px rgba(255, 107, 53, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      height: 100%; 
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      
+      /* 動態背景 - 白色主題 */
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 149, 0, 0.03) 0%, transparent 50%),
+        var(--bg-gradient);
+      
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+    
+    @keyframes backgroundShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* 創客風格頭部 */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 0;
+      
+      /* 科技感邊框陰影 */
+      box-shadow: 
+        0 1px 0 rgba(0, 0, 0, 0.05),
+        0 1px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyber), var(--accent-purple));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: var(--glow-cyan);
+      animation: logoGlow 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes logoGlow {
+      from { box-shadow: var(--glow-cyan); }
+      to { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      color: var(--accent-cyber);
+      background: rgba(0, 212, 255, 0.08);
+      border-color: rgba(0, 212, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+    }
+
+    /* 主要內容容器 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* 英雄區域 */
+    .hero {
+      text-align: center;
+      padding: 60px 0 80px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, var(--accent-cyber) 0%, transparent 70%);
+      opacity: 0.1;
+      border-radius: 50%;
+      animation: heroGlow 4s ease-in-out infinite alternate;
+    }
+    
+    @keyframes heroGlow {
+      from { transform: translateX(-50%) scale(1); opacity: 0.1; }
+      to { transform: translateX(-50%) scale(1.2); opacity: 0.2; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-cyber), var(--accent-neon), var(--accent-electric));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 50px;
+      padding: 8px 20px;
+      color: var(--accent-cyber);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+    }
+
+    /* 區段標題 */
+    .section {
+      margin-bottom: 60px;
+    }
+
+    .section-header {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-cyber), var(--accent-neon), var(--accent-electric));
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-electric), var(--accent-maker));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: var(--glow-orange);
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    /* 卡片網格 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* 創客風格卡片 */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      
+      /* 白色主題陰影效果 */
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyber), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent-cyber);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 0 20px rgba(0, 212, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-content {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-icon img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px;
+    }
+
+    .card-info {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .card-action {
+      background: linear-gradient(135deg, var(--accent-cyber), var(--accent-purple));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+    }
+
+    .card-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 212, 255, 0.25);
+    }
+
+    /* 特殊效果卡片變化 */
+    .card:nth-child(2n) .card-icon {
+      background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(255, 107, 53, 0.1));
+      border-color: rgba(57, 255, 20, 0.2);
+    }
+
+    .card:nth-child(3n) .card-icon {
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 149, 0, 0.1));
+      border-color: rgba(255, 107, 53, 0.2);
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 16px;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .hero {
+        padding: 40px 0 60px;
+      }
+      
+      .container {
+        padding: 20px 16px;
+      }
+      
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .card-content {
+        gap: 16px;
+      }
+      
+      .card-icon {
+        width: 64px;
+        height: 64px;
+      }
+      
+      .card-icon img {
+        width: 56px;
+        height: 56px;
+      }
+    }
+
+    /* 特殊裝飾效果 */
+    .circuit-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.008;
+      z-index: -1;
+      background-image: 
+        linear-gradient(90deg, #64748b 1px, transparent 1px),
+        linear-gradient(180deg, #64748b 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: circuitMove 50s linear infinite;
+    }
+    
+    @keyframes circuitMove {
+      from { transform: translate(0, 0); }
+      to { transform: translate(40px, 40px); }
+    }
+
+    /* 輪播圖樣式 */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: 40px auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+
+    .carousel-wrapper {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      width: 300%;
+      height: 100%;
+      animation: carousel 12s infinite;
+    }
+
+    .carousel-slide {
+      width: 33.333%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .carousel-slide:hover img {
+      transform: scale(1.05);
+    }
+
+    .carousel-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+      color: white;
+      padding: 30px 24px 24px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .carousel-slide:hover .carousel-overlay {
+      transform: translateY(0);
+    }
+
+    .carousel-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .carousel-desc {
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    @keyframes carousel {
+      0%, 30% {
+        transform: translateX(0);
+      }
+      33.33%, 63.33% {
+        transform: translateX(-33.333%);
+      }
+      66.66%, 96.66% {
+        transform: translateX(-66.666%);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .carousel-indicators {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .carousel-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: indicatorCycle 12s infinite;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 2px;
+      position: relative;
+    }
+    
+    .carousel-indicator:hover {
+      background: rgba(0, 212, 255, 0.6);
+      transform: scale(1.1);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .carousel-indicator:active {
+      transform: scale(0.95);
+    }
+
+    .carousel-indicator:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .carousel-indicator:nth-child(2) {
+      animation-delay: 4s;
+    }
+
+    .carousel-indicator:nth-child(3) {
+      animation-delay: 8s;
+    }
+
+    @keyframes indicatorCycle {
+      0%, 30% {
+        background: rgba(0, 212, 255, 0.8);
+        transform: scale(1.2);
+      }
+      33.33%, 100% {
+        background: rgba(255, 255, 255, 0.5);
+        transform: scale(1);
+      }
+    }
+
+    .carousel-pause-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      font-size: 16px;
+    }
+
+    .carousel-pause-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .carousel-wrapper {
+        height: 250px;
+      }
+      
+      .carousel-container {
+        margin: 20px 16px;
+        border-radius: 16px;
+      }
+      
+      .carousel-overlay {
+        padding: 20px 16px 16px;
+      }
+      
+      .carousel-title {
+        font-size: 1.2rem;
+      }
+      
+      .carousel-desc {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 電路板背景圖案 -->
+  <div class="circuit-pattern"></div>
+  
+  <header>
+    <nav class="navbar">
+      <a href="#" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>創客電子學院</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#circuits" class="nav-link">基礎電路</a></li>
+        <li><a href="#components" class="nav-link">電子元件</a></li>
+        <li><a href="#arduino" class="nav-link">Arduino</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- 英雄區域 -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span>🔥</span>
+        <span>從零開始的創客之路</span>
+      </div>
+      <h1>探索電子世界的無限可能</h1>
+      <p>
+        透過互動式學習，掌握電子元件原理，踏上Arduino創客之旅。
+        用最生動的方式，讓複雜的電子概念變得簡單易懂！
+      </p>
+      
+      <!-- 精彩內容輪播 -->
+      <div class="carousel-container" id="mainCarousel">
+        <div class="carousel-wrapper">
+          <div class="carousel-track">
+            <div class="carousel-slide">
+              <img src="封面圖片/1.jpg" alt="Arduino創客實驗室">
+              <div class="carousel-overlay">
+                <div class="carousel-title">Arduino創客實驗室</div>
+                <div class="carousel-desc">動手實作各種有趣的電子專案，從基礎到進階，一步步成為創客高手！</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="封面圖片/2.jpg" alt="電子元件探索">
+              <div class="carousel-overlay">
+                <div class="carousel-title">電子元件探索</div>
+                <div class="carousel-desc">深入了解各種電子元件的工作原理，用生動的比喻讓學習變得簡單有趣。</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="封面圖片/3.jpg" alt="創客精神實踐">
+              <div class="carousel-overlay">
+                <div class="carousel-title">創客精神實踐</div>
+                <div class="carousel-desc">培養動手做、勇於嘗試的創客精神，讓想像力變成現實中的作品！</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 輪播指示器 -->
+        <div class="carousel-indicators">
+          <div class="carousel-indicator"></div>
+          <div class="carousel-indicator"></div>
+          <div class="carousel-indicator"></div>
+        </div>
+        
+        <!-- 暫停/播放按鈕 -->
+        <button class="carousel-pause-btn" id="carouselPauseBtn" title="暫停輪播">
+          ⏸️
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- 基礎電路系列 -->
+    <section class="section" id="circuits">
+      <div class="section-header">
+        <h2 class="section-title">
+          <div class="section-icon">🔌</div>
+          基礎電路系列
+        </h2>
+        <p class="section-desc">
+          用生活中的例子，讓小朋友輕鬆理解電路的神奇世界！從水流到電流，從開關到燈泡，一起探索電的奧秘。
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">💧</div>
+            <div class="card-info">
+              <h3 class="card-title">電流就像水流</h3>
+              <p class="card-desc">用水管和水流的例子，讓小朋友理解電流、電壓和電阻的基本概念。</p>
+              <a class="card-action" href="circuits/current-flow.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🔋</div>
+            <div class="card-info">
+              <h3 class="card-title">電池的秘密</h3>
+              <p class="card-desc">電池為什麼能發電？正極負極有什麼不同？一起來認識電池家族。</p>
+              <a class="card-action" href="circuits/battery-power.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🔌</div>
+            <div class="card-info">
+              <h3 class="card-title">完整的電路</h3>
+              <p class="card-desc">電為什麼要繞一圈？學習串聯、並聯，以及如何讓電流安全地工作。</p>
+              <a class="card-action" href="circuits/complete-circuit.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">⚠️</div>
+            <div class="card-info">
+              <h3 class="card-title">危險的短路</h3>
+              <p class="card-desc">什麼是短路？為什麼會危險？學會安全用電，保護自己和家人。</p>
+              <a class="card-action" href="circuits/short-circuit.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">💡</div>
+            <div class="card-info">
+              <h3 class="card-title">開關的魔法</h3>
+              <p class="card-desc">一個小小的開關，如何控制整個電路？探索各種開關的神奇功能。</p>
+              <a class="card-action" href="circuits/switch-magic.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🏠</div>
+            <div class="card-info">
+              <h3 class="card-title">家裡的電路</h3>
+              <p class="card-desc">從插座到電燈，認識家中的電路系統，學會安全使用電器設備。</p>
+              <a class="card-action" href="circuits/home-circuits.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <!-- 電子元件系列 -->
+    <section class="section" id="components">
+      <div class="section-header">
+        <h2 class="section-title">
+          <div class="section-icon">🔧</div>
+          電子元件系列
+        </h2>
+        <p class="section-desc">
+          認識各種電子元件，學習它們的功能和使用方法。從基礎的電阻到複雜的三極體，每個元件都有它獨特的魅力！
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/麵包板.JPG" alt="麵包板"></div>
+            <div class="card-info">
+              <h3 class="card-title">麵包板</h3>
+              <p class="card-desc">不用烙鐵的拼積木電路板：上/下兩條為橫向電源軌；中間每列直的 5 個洞相通。</p>
+              <a class="card-action" href="components/breadboard.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/杜邦線.jpg" alt="杜邦線"></div>
+            <div class="card-info">
+              <h3 class="card-title">杜邦線</h3>
+              <p class="card-desc">像延長線，把兩點接起來讓電流通過。可選擇顏色和接頭類型。</p>
+              <a class="card-action" href="components/dupont.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/電阻.JPG" alt="電阻"></div>
+            <div class="card-info">
+              <h3 class="card-title">電阻</h3>
+              <p class="card-desc">限制電流，保護元件。透過色碼環讀取電阻值，模擬水流與電阻的關係。</p>
+              <a class="card-action" href="components/resistor.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/三色LED.JPG" alt="三色LED"></div>
+            <div class="card-info">
+              <h3 class="card-title">三色 LED</h3>
+              <p class="card-desc">RGB混色原理與電阻控制亮度的互動教學。紅綠藍三原色混出萬千色彩。</p>
+              <a class="card-action" href="components/led.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/震動馬達.JPG" alt="震動馬達"></div>
+            <div class="card-info">
+              <h3 class="card-title">震動馬達</h3>
+              <p class="card-desc">探索震動原理與控制技術。調整強度、頻率，體驗不同震動模式的觸覺反饋。</p>
+              <a class="card-action" href="components/vibration-motor.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/數碼管.JPG" alt="數碼管"></div>
+            <div class="card-info">
+              <h3 class="card-title">數碼管</h3>
+              <p class="card-desc">七段LED組成數字顯示。學習顯示邏輯、電路連接與數字編碼原理。</p>
+              <a class="card-action" href="components/seven-segment.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/蜂鳴器.JPG" alt="蜂鳴器"></div>
+            <div class="card-info">
+              <h3 class="card-title">蜂鳴器</h3>
+              <p class="card-desc">Arduino音效控制教學。學習tone()函數、音階頻率與聲波原理。</p>
+              <a class="card-action" href="components/buzzer.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/二極體.JPG" alt="二極體"></div>
+            <div class="card-info">
+              <h3 class="card-title">二極體</h3>
+              <p class="card-desc">單向導電元件。學習正反向偏壓、電流流向與整流保護應用。</p>
+              <a class="card-action" href="components/diode.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/三極體.JPG" alt="三極體"></div>
+            <div class="card-info">
+              <h3 class="card-title">三極體</h3>
+              <p class="card-desc">小電流控制大電流。電流放大開關，智慧控制電路的核心元件。</p>
+              <a class="card-action" href="components/transistor.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon"><img src="元件圖片區/按鈕.JPG" alt="按鈕"></div>
+            <div class="card-info">
+              <h3 class="card-title">按鈕</h3>
+              <p class="card-desc">最基本的開關元件。學習瞬時按鈕與切換按鈕的工作原理和應用。</p>
+              <a class="card-action" href="components/button.html">探索原理</a>
+            </div>
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <!-- Arduino 教學部分 -->
+    <section class="section" id="arduino">
+      <div class="section-header">
+        <h2 class="section-title">
+          <div class="section-icon">🤖</div>
+          Arduino 實作教學
+        </h2>
+        <p class="section-desc">
+          學會元件後，開始用 Arduino 做出真正的互動專案！從IDE安裝到與ChatGPT協作，讓AI成為你的程式設計夥伴。
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">💻</div>
+            <div class="card-info">
+              <h3 class="card-title">Arduino IDE 安裝</h3>
+              <p class="card-desc">下載並安裝Arduino開發環境，設定開發板與序列埠連接。</p>
+              <a class="card-action" href="arduino/ide-install.html">開始安裝</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">⚙️</div>
+            <div class="card-info">
+              <h3 class="card-title">IDE 使用教學</h3>
+              <p class="card-desc">學習Arduino IDE介面、程式上傳、序列監視器等基本操作。</p>
+              <a class="card-action" href="arduino/ide-usage.html">開始學習</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">📌</div>
+            <div class="card-info">
+              <h3 class="card-title">接腳原理</h3>
+              <p class="card-desc">認識Arduino各種接腳功能：數位、類比、PWM、電源接腳應用。</p>
+              <a class="card-action" href="arduino/pin-theory.html">深入了解</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🤖</div>
+            <div class="card-info">
+              <h3 class="card-title">ChatGPT 協作</h3>
+              <p class="card-desc">學習如何與AI協作寫程式，提問技巧與程式除錯方法。</p>
+              <a class="card-action" href="arduino/chatgpt-guide.html">AI協作</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🌈</div>
+            <div class="card-info">
+              <h3 class="card-title">功課一：RGB燈控制</h3>
+              <p class="card-desc">按鈕控制RGB LED變色：紅→藍→綠→關閉，循環切換。與AI討論電路連接與程式邏輯。</p>
+              <a class="card-action" href="arduino/project1-rgb.html">開始挑戰</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">⏱️</div>
+            <div class="card-info">
+              <h3 class="card-title">功課二：數碼管倒數</h3>
+              <p class="card-desc">按鈕啟動數碼管倒數計時功能。學習時間控制與數字顯示邏輯。</p>
+              <a class="card-action" href="arduino/project2-segment.html">開始挑戰</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🔔</div>
+            <div class="card-info">
+              <h3 class="card-title">功課三：蜂鳴器控制</h3>
+              <p class="card-desc">按鈕觸發蜂鳴器發聲。探索音頻控制與頻率調節原理。</p>
+              <a class="card-action" href="arduino/project3-buzzer.html">開始挑戰</a>
+            </div>
+        </div>
+      </article>
+
+        <article class="card">
+          <div class="card-content">
+            <div class="card-icon">🔄</div>
+            <div class="card-info">
+              <h3 class="card-title">功課四：震動馬達</h3>
+              <p class="card-desc">按鈕控制震動馬達啟動。學習PWM控制與馬達驅動技術。</p>
+              <a class="card-action" href="arduino/project4-motor.html">開始挑戰</a>
+            </div>
+        </div>
+      </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // 輪播控制功能
+    document.addEventListener('DOMContentLoaded', function() {
+      const carousel = document.getElementById('mainCarousel');
+      const carouselTrack = carousel.querySelector('.carousel-track');
+      const pauseBtn = document.getElementById('carouselPauseBtn');
+      const indicators = carousel.querySelectorAll('.carousel-indicator');
+      
+      let isPaused = false;
+      let currentSlide = 0;
+      let manualControl = false;
+      
+      // 暫停/播放功能
+      pauseBtn.addEventListener('click', function() {
+        isPaused = !isPaused;
+        
+        if (isPaused) {
+          carouselTrack.style.animationPlayState = 'paused';
+          indicators.forEach(indicator => {
+            indicator.style.animationPlayState = 'paused';
+          });
+          pauseBtn.innerHTML = '▶️';
+          pauseBtn.title = '繼續輪播';
+        } else {
+          carouselTrack.style.animationPlayState = 'running';
+          indicators.forEach(indicator => {
+            indicator.style.animationPlayState = 'running';
+          });
+          pauseBtn.innerHTML = '⏸️';
+          pauseBtn.title = '暫停輪播';
+        }
+      });
+      
+      // 滑鼠懸停時暫停
+      carousel.addEventListener('mouseenter', function() {
+        if (!isPaused) {
+          carouselTrack.style.animationPlayState = 'paused';
+          indicators.forEach(indicator => {
+            indicator.style.animationPlayState = 'paused';
+          });
+        }
+      });
+      
+      // 滑鼠離開時繼續
+      carousel.addEventListener('mouseleave', function() {
+        if (!isPaused) {
+          carouselTrack.style.animationPlayState = 'running';
+          indicators.forEach(indicator => {
+            indicator.style.animationPlayState = 'running';
+          });
+        }
+      });
+      
+      // 跳轉到指定幻燈片的函數
+      function goToSlide(slideIndex) {
+        currentSlide = slideIndex;
+        manualControl = true;
+        
+        // 停止當前動畫
+        carouselTrack.style.animation = 'none';
+        
+        // 立即跳轉到指定位置
+        const translateValue = -33.333 * slideIndex;
+        carouselTrack.style.transform = `translateX(${translateValue}%)`;
+        
+        // 更新所有指示器狀態
+        indicators.forEach((ind, idx) => {
+          if (idx === slideIndex) {
+            ind.style.background = 'rgba(0, 212, 255, 0.8)';
+            ind.style.transform = 'scale(1.2)';
+            ind.style.animation = 'none';
+          } else {
+            ind.style.background = 'rgba(255, 255, 255, 0.5)';
+            ind.style.transform = 'scale(1)';
+            ind.style.animation = 'none';
+          }
+        });
+        
+        // 2秒後恢復自動輪播
+        setTimeout(() => {
+          if (!isPaused) {
+            manualControl = false;
+            carouselTrack.style.animation = 'carousel 12s infinite';
+            indicators.forEach(ind => {
+              ind.style.animation = 'indicatorCycle 12s infinite';
+            });
+          }
+        }, 2000);
+      }
+      
+      // 點擊指示器跳轉到對應圖片
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', function() {
+          goToSlide(index);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

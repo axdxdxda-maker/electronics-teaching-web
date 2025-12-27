@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>電流就像水流 - 基礎電路教學</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --secondary: #FFC107;
+      --background: #f8f9fa;
+      --text: #333;
+      --border: #e9ecef;
+      --card-bg: #fff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --water: #00BCD4;
+      --electric: #FF9800;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav h1 {
+      font-size: 1.5rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .intro h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .comparison-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .water-side {
+      background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+      border: 3px solid var(--water);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .electric-side {
+      background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+      border: 3px solid var(--electric);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .flow-demo {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .pipe-container {
+      position: relative;
+      background: #E3F2FD;
+      border: 3px solid var(--water);
+      border-radius: 20px;
+      height: 80px;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+
+    .water-flow {
+      position: absolute;
+      top: 20px;
+      left: -50px;
+      width: 50px;
+      height: 40px;
+      background: var(--water);
+      border-radius: 50%;
+      animation: flowAnimation 3s linear infinite;
+    }
+
+    @keyframes flowAnimation {
+      0% { left: -50px; }
+      100% { left: 100%; }
+    }
+
+    .wire-container {
+      position: relative;
+      background: #333;
+      border-radius: 10px;
+      height: 20px;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+
+    .electron-flow {
+      position: absolute;
+      top: 5px;
+      left: -10px;
+      width: 10px;
+      height: 10px;
+      background: var(--electric);
+      border-radius: 50%;
+      animation: electronAnimation 2s linear infinite;
+    }
+
+    @keyframes electronAnimation {
+      0% { left: -10px; }
+      100% { left: 100%; }
+    }
+
+    .interactive-demo {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .control-panel {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .control-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .control-btn.active {
+      background: var(--secondary);
+      color: var(--text);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .demo-display {
+      background: var(--background);
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .quiz-section {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .quiz-question {
+      background: var(--background);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      border-left: 4px solid var(--primary);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .quiz-option {
+      background: white;
+      border: 2px solid var(--border);
+      padding: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .quiz-option.correct {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+
+    .quiz-option.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+    }
+
+    .concept-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .concept-card {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .concept-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .concept-card h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding: 1rem 0;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .control-panel {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>💧 電流就像水流</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>🌊 電流和水流有什麼相同？</h2>
+      <p>你知道嗎？電流其實很像水流！讓我們用大家熟悉的水來理解神奇的電流世界。</p>
+    </div>
+
+    <div class="comparison-section">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🔍 水流 vs 電流對比</h3>
+      
+      <div class="comparison-grid">
+        <div class="water-side">
+          <h3 style="color: var(--water); margin-bottom: 1rem;">💧 水流世界</h3>
+          <div style="font-size: 2rem; margin: 1rem 0;">🚰➡️🌊➡️🏠</div>
+          <p><strong>水塔：</strong>儲存水，提供壓力</p>
+          <p><strong>水管：</strong>讓水流動的通道</p>
+          <p><strong>水龍頭：</strong>控制水流開關</p>
+          <p><strong>水流：</strong>水在管子裡流動</p>
+        </div>
+
+        <div class="electric-side">
+          <h3 style="color: var(--electric); margin-bottom: 1rem;">⚡ 電流世界</h3>
+          <div style="font-size: 2rem; margin: 1rem 0;">🔋➡️⚡➡️💡</div>
+          <p><strong>電池：</strong>儲存電，提供電壓</p>
+          <p><strong>電線：</strong>讓電流動的通道</p>
+          <p><strong>開關：</strong>控制電流開關</p>
+          <p><strong>電流：</strong>電在線裡流動</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-demo">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🎬 流動動畫示範</h3>
+      
+      <div style="margin: 2rem 0;">
+        <h4>💧 水在管子裡流動</h4>
+        <div class="pipe-container">
+          <div class="water-flow"></div>
+        </div>
+        <p style="text-align: center;">水從高壓的地方流向低壓的地方</p>
+      </div>
+
+      <div style="margin: 2rem 0;">
+        <h4>⚡ 電在電線裡流動</h4>
+        <div class="wire-container">
+          <div class="electron-flow"></div>
+        </div>
+        <p style="text-align: center;">電從高電壓的地方流向低電壓的地方</p>
+      </div>
+    </div>
+
+    <div class="interactive-demo">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🎮 互動學習：調節流量</h3>
+      
+      <div class="control-panel">
+        <button class="control-btn" onclick="changeFlow('slow')">慢速流動</button>
+        <button class="control-btn" onclick="changeFlow('normal')">正常流動</button>
+        <button class="control-btn" onclick="changeFlow('fast')">快速流動</button>
+        <button class="control-btn" onclick="changeFlow('stop')">停止流動</button>
+      </div>
+
+      <div class="demo-display" id="flowDisplay">
+        <h4>🌊 目前流動狀態：正常流動</h4>
+        <p>就像調節水龍頭一樣，我們也可以控制電流的大小！</p>
+      </div>
+    </div>
+
+    <div class="concept-cards">
+      <div class="concept-card">
+        <div class="concept-icon">🔋</div>
+        <h3>電壓 = 水壓</h3>
+        <p>電池就像水塔，提供「電壓」推動電流，就像水塔提供水壓推動水流一樣。電壓越高，推動力越強！</p>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-icon">⚡</div>
+        <h3>電流 = 水流</h3>
+        <p>電流就是電子在電線裡流動，就像水在水管裡流動。電流越大，流過的電子越多！</p>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-icon">🚧</div>
+        <h3>電阻 = 水管阻力</h3>
+        <p>電阻就像窄水管會阻礙水流，電阻會阻礙電流。電阻越大，電流越小！</p>
+      </div>
+    </div>
+
+    <div class="quiz-section">
+      <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">🧠 小測驗：你學會了嗎？</h3>
+      
+      <div class="quiz-question">
+        <h4>🤔 問題：如果水管變細了，水流會怎麼樣？</h4>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answerQuiz(this, false)">💨 流得更快</div>
+          <div class="quiz-option" onclick="answerQuiz(this, true)">🐌 流得更慢</div>
+          <div class="quiz-option" onclick="answerQuiz(this, false)">🛑 完全停止</div>
+          <div class="quiz-option" onclick="answerQuiz(this, false)">🌊 沒有改變</div>
+        </div>
+        <div id="quiz1Result" style="margin-top: 1rem; font-weight: bold;"></div>
+      </div>
+
+      <div class="quiz-question">
+        <h4>🤔 問題：電池在電路中的作用像什麼？</h4>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answerQuiz2(this, false)">🚰 水龍頭</div>
+          <div class="quiz-option" onclick="answerQuiz2(this, true)">🏠 水塔</div>
+          <div class="quiz-option" onclick="answerQuiz2(this, false)">🔧 水管</div>
+          <div class="quiz-option" onclick="answerQuiz2(this, false)">🚿 蓮蓬頭</div>
+        </div>
+        <div id="quiz2Result" style="margin-top: 1rem; font-weight: bold;"></div>
+      </div>
+    </div>
+
+    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; padding: 2rem; margin: 2rem 0; text-align: center;">
+      <h3 style="color: #155724;">🎉 恭喜你學會了電流的基本概念！</h3>
+      <p>現在你知道電流就像水流一樣，需要壓力（電壓）來推動，會被阻力（電阻）影響。這些概念將幫助你理解更多電路知識！</p>
+    </div>
+
+    <div class="navigation">
+      <a href="../index.html" class="nav-btn">🏠 返回首頁</a>
+      <a href="battery-power.html" class="nav-btn">下一課：電池的秘密 ➡️</a>
+    </div>
+  </div>
+
+  <script>
+    function changeFlow(speed) {
+      const display = document.getElementById('flowDisplay');
+      const buttons = document.querySelectorAll('.control-btn');
+      const waterFlow = document.querySelector('.water-flow');
+      const electronFlow = document.querySelector('.electron-flow');
+      
+      // 移除所有active狀態
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      // 添加active到點擊的按鈕
+      event.target.classList.add('active');
+      
+      // 根據速度設定動畫時間
+      let animationDuration;
+      let animationState = 'running';
+      
+      switch(speed) {
+        case 'slow':
+          animationDuration = '6s'; // 慢速：6秒
+          display.innerHTML = `
+            <h4>🐌 目前流動狀態：慢速流動</h4>
+            <p>就像小小的水流，電流也變小了。適合驅動小功率的設備！</p>
+          `;
+          break;
+        case 'normal':
+          animationDuration = '3s'; // 正常：3秒
+          display.innerHTML = `
+            <h4>🌊 目前流動狀態：正常流動</h4>
+            <p>穩定的流量，適合大部分的電器設備正常工作。</p>
+          `;
+          break;
+        case 'fast':
+          animationDuration = '1s'; // 快速：1秒
+          display.innerHTML = `
+            <h4>💨 目前流動狀態：快速流動</h4>
+            <p>大電流！可以驅動更大功率的設備，但也要小心安全喔！</p>
+          `;
+          break;
+        case 'stop':
+          animationState = 'paused'; // 停止動畫
+          animationDuration = '3s'; // 保持原有時間，但暫停
+          display.innerHTML = `
+            <h4>🛑 目前流動狀態：停止流動</h4>
+            <p>沒有電流流動，就像關掉水龍頭一樣，設備就不工作了。</p>
+          `;
+          break;
+      }
+      
+      // 應用動畫變化
+      if (waterFlow) {
+        waterFlow.style.animationDuration = animationDuration;
+        waterFlow.style.animationPlayState = animationState;
+      }
+      
+      if (electronFlow) {
+        // 電子流動畫比水流稍快一些
+        const electronDuration = speed === 'stop' ? animationDuration : 
+          (parseFloat(animationDuration) * 0.8) + 's';
+        electronFlow.style.animationDuration = electronDuration;
+        electronFlow.style.animationPlayState = animationState;
+      }
+      
+      // 添加視覺反饋效果
+      if (speed === 'fast') {
+        waterFlow.style.background = '#ff6b6b'; // 快速時變紅色
+        electronFlow.style.background = '#ffaa00'; // 快速時變橙色
+      } else if (speed === 'slow') {
+        waterFlow.style.background = '#87ceeb'; // 慢速時變淺藍色
+        electronFlow.style.background = '#ffd700'; // 慢速時變金色
+      } else if (speed === 'stop') {
+        waterFlow.style.opacity = '0.3'; // 停止時變透明
+        electronFlow.style.opacity = '0.3';
+      } else {
+        // 恢復正常顏色
+        waterFlow.style.background = 'var(--water)';
+        electronFlow.style.background = 'var(--electric)';
+        waterFlow.style.opacity = '1';
+        electronFlow.style.opacity = '1';
+      }
+    }
+
+    function answerQuiz(element, isCorrect) {
+      const options = element.parentNode.querySelectorAll('.quiz-option');
+      const result = document.getElementById('quiz1Result');
+      
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt === element) {
+          if (isCorrect) {
+            opt.classList.add('correct');
+            result.innerHTML = '✅ 正確！水管變細會增加阻力，水流變慢。電路中電阻增加也會讓電流變小！';
+            result.style.color = '#28a745';
+          } else {
+            opt.classList.add('wrong');
+            result.innerHTML = '❌ 不對喔！想想看，用細吸管喝飲料是不是比較難吸？';
+            result.style.color = '#dc3545';
+          }
+        }
+      });
+    }
+
+    function answerQuiz2(element, isCorrect) {
+      const options = element.parentNode.querySelectorAll('.quiz-option');
+      const result = document.getElementById('quiz2Result');
+      
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt === element) {
+          if (isCorrect) {
+            opt.classList.add('correct');
+            result.innerHTML = '✅ 正確！電池像水塔一樣，儲存能量並提供壓力（電壓）來推動電流！';
+            result.style.color = '#28a745';
+          } else {
+            opt.classList.add('wrong');
+            result.innerHTML = '❌ 再想想看！電池是提供能量的地方，就像...？';
+            result.style.color = '#dc3545';
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

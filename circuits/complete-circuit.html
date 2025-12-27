@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>完整的電路 - 基礎電路教學（SVG 修正版）</title>
+  <style>
+    :root {
+      --primary:#2196F3; --primary-dark:#1976D2; --secondary:#FFC107;
+      --background:#f8f9fa; --text:#333; --border:#e9ecef; --card-bg:#fff;
+      --shadow:0 2px 10px rgba(0,0,0,0.1);
+      --wire:#2b2d42; --active:#4CAF50; --broken:#F44336; --dim:#bdbdbd;
+      --lamp-on:#FFD54F; --lamp-off:#B0BEC5;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Microsoft YaHei', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--background); color:var(--text); line-height:1.6; }
+    .header { background:var(--primary); color:#fff; padding:1rem 0; box-shadow:var(--shadow); }
+    .nav { max-width:1200px; margin:0 auto; padding:0 1rem; display:flex; justify-content:space-between; align-items:center; }
+    .nav h1 { font-size:1.5rem; }
+    .nav a { color:#fff; text-decoration:none; padding:.5rem 1rem; border-radius:5px; transition:.2s; }
+    .nav a:hover { background:var(--primary-dark); }
+    .container { max-width:1200px; margin:2rem auto; padding:0 1rem; }
+    .intro,.circuit-basics,.series-parallel,.interactive-demo,.card { background:var(--card-bg); padding:2rem; border-radius:10px; box-shadow:var(--shadow); margin-bottom:2rem; }
+    .intro h2,.section-title { color:var(--primary); text-align:center; margin-bottom:1rem; font-size:2rem; }
+    .circuit-comparison { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin:2rem 0; }
+    .complete-example { border:3px solid var(--active); border-radius:15px; padding:1rem; background:linear-gradient(135deg,#e8f5e8,#c8e6c9); }
+    .incomplete-example { border:3px solid var(--broken); border-radius:15px; padding:1rem; background:linear-gradient(135deg,#ffebee,#ffcdd2); }
+    .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin:2rem 0; }
+    .circuit-type { background:#fff; border:1px solid var(--border); border-radius:15px; padding:1.5rem; }
+    .demo-controls, .nav-row { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+    .demo-btn, .nav-btn { background:var(--primary); color:#fff; border:none; padding:1rem 1.25rem; border-radius:10px; cursor:pointer; font-size:1rem; transition:.2s; text-decoration:none; display:inline-block; }
+    .demo-btn:hover, .nav-btn:hover { background:var(--primary-dark); transform:translateY(-2px); }
+    .demo-btn.active { background:var(--secondary); color:#000; }
+    .status { text-align:center; font-weight:bold; margin-top:.75rem; }
+    .navigation { display:flex; justify-content:space-between; margin-top:2rem; padding:1rem 0; }
+    @media (max-width: 920px) { .circuit-comparison,.comparison-grid{grid-template-columns:1fr;} .navigation { flex-direction:column; gap:1rem; } }
+
+    /* SVG styling */
+    .schematic { width:100%; max-width:520px; margin:0 auto; display:block; }
+    .wire { stroke:var(--wire); stroke-width:4; fill:none; stroke-linecap:round; }
+    .battery-plus { stroke:#E53935; stroke-width:4; }
+    .battery-minus{ stroke:#1E88E5; stroke-width:4; }
+    .switch { stroke:#FB8C00; stroke-width:6; stroke-linecap:round; }
+    .switch.closed { stroke:#7CB342; }
+    .lamp-bulb { fill:var(--lamp-off); stroke:#607D8B; stroke-width:2; }
+    .lamp-glow { opacity:0; }
+    .lamp.on .lamp-bulb { fill:var(--lamp-on); }
+    .lamp.on .lamp-glow { opacity:.85; }
+    .lamp.dim .lamp-bulb { fill:#FFE082; }
+    .lamp.dim .lamp-glow { opacity:.5; }
+    .rail { stroke:#90A4AE; stroke-dasharray:6 6; }
+    .label { font: 500 14px/1 sans-serif; fill:#455A64; }
+
+    /* nice glow when ON */
+    .glow-filter { filter:url(#glow); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <h1>🔌 完整的電路</h1>
+      <a href="../index.html">🏠 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <h2>🔄 電為什麼要繞一圈？</h2>
+      <p>電就像跑操場一樣，需要一個完整的圓圈才能跑起來！讓我們用正確的電路圖來看「什麼是閉合回路」。</p>
+    </div>
+
+    <!-- 完整 vs 不完整（SVG 取代表情排版） -->
+    <div class="circuit-basics">
+      <h3 class="section-title">🔄 什麼是完整的電路？</h3>
+
+      <div class="circuit-comparison">
+        <!-- 完整 -->
+        <div class="complete-example">
+          <h4 style="color:#2e7d32; text-align:center; margin-bottom:.75rem;">✅ 完整電路（閉合）</h4>
+          <svg viewBox="0 0 520 240" class="schematic" aria-label="完整電路">
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="6" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <!-- 外框導線 -->
+            <polyline class="wire" points="60,40 460,40 460,200 60,200 60,40"/>
+            <!-- 電池與極性標示（加大Icon） -->
+            <text x="36" y="98" class="label" style="font-size:24px">🔋</text>
+            <text x="100" y="58" class="label">正極</text>
+            <text x="100" y="194" class="label">負極</text>
+            <!-- 開關（閉合） -->
+            <line x1="200" y1="40" x2="260" y2="40" class="switch closed"/>
+            <text x="215" y="28" class="label">Switch</text>
+            <!-- 電阻 -->
+            <polyline class="wire" points="300,40 312,55 324,25 336,55 348,25 360,55 372,25 384,40"/>
+            <text x="310" y="18" class="label">R</text>
+            <!-- 燈泡（以圓心置中） -->
+            <g class="lamp on glow-filter">
+              <circle cx="460" cy="120" r="18" class="lamp-bulb"/>
+              <circle cx="460" cy="120" r="34" fill="#FFD54F" class="lamp-glow"/>
+            </g>
+            <!-- 連接燈泡上下 -->
+            <line x1="460" y1="40" x2="460" y2="102" class="wire"/>
+            <line x1="460" y1="138" x2="460" y2="200" class="wire"/>
+          </svg>
+          <p class="status" style="color:#2e7d32;">💡 燈泡會亮！電流可以順利流動</p>
+        </div>
+
+        <!-- 不完整 -->
+        <div class="incomplete-example">
+          <h4 style="color:#c62828; text-align:center; margin-bottom:.75rem;">❌ 不完整電路（開路）</h4>
+          <svg viewBox="0 0 520 240" class="schematic" aria-label="不完整電路">
+            <!-- 外框導線（上方缺口） -->
+            <polyline class="wire" points="60,40 240,40"/>
+            <polyline class="wire" points="320,40 460,40 460,200 60,200 60,40"/>
+            <!-- 斷開符號 -->
+            <line x1="240" y1="40" x2="300" y2="60" stroke="var(--broken)" stroke-width="5" stroke-linecap="round"/>
+            <!-- 電池與極性標示（移除彩色短線） -->
+            <text x="36" y="98" class="label" style="font-size:24px">🔋</text>
+            <text x="100" y="58" class="label">正極</text>
+            <text x="100" y="194" class="label">負極</text>
+            <!-- 燈泡（不亮，置中） -->
+            <g class="lamp">
+              <circle cx="460" cy="120" r="18" class="lamp-bulb"/>
+            </g>
+            <line x1="460" y1="40" x2="460" y2="102" class="wire"/>
+            <line x1="460" y1="138" x2="460" y2="200" class="wire"/>
+          </svg>
+          <p class="status" style="color:#c62828;">💡 不亮！上方路徑中斷，電流無法成圈</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 串聯 vs 並聯（SVG + 互動） -->
+    <div class="series-parallel">
+      <h3 class="section-title">🔗 串聯 vs 並聯</h3>
+
+      <div class="comparison-grid">
+        <!-- 串聯電路 -->
+        <div class="circuit-type">
+          <h4 style="text-align:center;">串聯電路</h4>
+          <svg id="seriesSvg" viewBox="0 0 560 220" class="schematic" aria-label="串聯電路">
+            <defs>
+              <filter id="glow2">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- 導線 -->
+            <polyline class="wire" points="70,40 500,40 500,180 70,180 70,40"/>
+            <!-- 電池（移除正負短線，僅保留Icon與文字） -->
+            <text x="44" y="100" class="label" style="font-size:24px">🔋</text>
+            <text x="140" y="62" class="label">正極</text>
+            <text x="140" y="192" class="label">負極</text>
+            <text x="140" y="62" class="label">正極</text>
+            <text x="140" y="192" class="label">負極</text>
+            <!-- 兩顆燈泡串聯在上邊 -->
+            <g id="sLamp1" class="lamp" transform="translate(260,40)">
+              <circle cx="0" cy="0" r="18" class="lamp-bulb"/>
+              <circle cx="0" cy="0" r="34" fill="#FFD54F" class="lamp-glow"/>
+            </g>
+            <g id="sLamp2" class="lamp" transform="translate(380,40)">
+              <circle cx="0" cy="0" r="18" class="lamp-bulb"/>
+              <circle cx="0" cy="0" r="34" fill="#FFD54F" class="lamp-glow"/>
+            </g>
+            <!-- 連接燈泡到下邊 -->
+            <line x1="500" y1="40" x2="500" y2="180" class="wire"/>
+            <line x1="70"  y1="180" x2="70"  y2="40"  class="wire"/>
+          </svg>
+          <div class="demo-controls" style="margin-top:1rem;">
+            <button class="demo-btn" onclick="toggleSeries()">開關串聯電路</button>
+          </div>
+          <p class="status" id="seriesStatus">說明：串聯只有一條路，一個壞掉，全滅。</p>
+        </div>
+
+        <!-- 並聯電路 -->
+        <div class="circuit-type">
+          <h4 style="text-align:center;">並聯電路</h4>
+          <svg id="parallelSvg" viewBox="0 0 560 240" class="schematic" aria-label="並聯電路">
+            <defs>
+              <filter id="glow3">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- 主幹（補全上下與左右邊線） -->
+            <polyline class="wire" points="70,40 500,40"/>
+            <polyline class="wire" points="70,200 500,200"/>
+            <line x1="70" y1="40" x2="70" y2="200" class="wire"/>
+            <line x1="500" y1="40" x2="500" y2="200" class="wire"/>
+            <!-- 電池（僅保留Icon與文字標示極性） -->
+            <text x="44" y="100" class="label" style="font-size:24px">🔋</text>
+            <text x="140" y="62" class="label">正極</text>
+            <text x="140" y="192" class="label">負極</text>
+            <!-- 上支路燈泡 -->
+            <g id="pLamp1" class="lamp" transform="translate(300,90)">
+              <circle cx="0" cy="0" r="18" class="lamp-bulb"/>
+              <circle cx="0" cy="0" r="34" fill="#FFD54F" class="lamp-glow"/>
+            </g>
+            <polyline class="wire" points="300,40 300,72"/>
+            <polyline class="wire" points="300,108 300,200"/>
+            <!-- 下支路燈泡 -->
+            <g id="pLamp2" class="lamp" transform="translate(420,140)">
+              <circle cx="0" cy="0" r="18" class="lamp-bulb"/>
+              <circle cx="0" cy="0" r="34" fill="#FFD54F" class="lamp-glow"/>
+            </g>
+            <polyline class="wire" points="420,40 420,122"/>
+            <polyline class="wire" points="420,158 420,200"/>
+          </svg>
+          <div class="demo-controls" style="margin-top:1rem;">
+            <button class="demo-btn" onclick="toggleParallel()">開關並聯電路</button>
+          </div>
+          <p class="status" id="parallelStatus">說明：並聯多條路，一個壞掉，其他照亮。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 互動：壞燈泡/修復 -->
+    <div class="interactive-demo">
+      <h3 class="section-title">🎮 串聯並聯體驗</h3>
+      <div class="demo-controls">
+        <button class="demo-btn" onclick="breakBulb()">💥 弄壞一個燈泡</button>
+        <button class="demo-btn" onclick="fixBulb()">🔧 修理燈泡</button>
+      </div>
+      <div id="demoResult" class="status"></div>
+    </div>
+
+    <!-- 你的下方卡片保持原意（略微潤飾文字） -->
+    <div class="card">
+      <h3 class="section-title" style="margin-bottom:1.5rem;">🔬 電路實驗小課堂</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem;">
+        <div style="background:#f8f9fa; padding:1.5rem; border-radius:10px; border-left:4px solid #28a745;">
+          <h4 style="color:#28a745; margin-bottom:1rem;">✅ 實驗一：簡單電路</h4>
+          <p><strong>材料：</strong>電池、LED、電阻、電線</p>
+          <p><strong>目標：</strong>讓 LED 安全發光（加保護電阻）</p>
+          <p><strong>重點：</strong>閉合回路 + 極性正確</p>
+        </div>
+        <div style="background:#f8f9fa; padding:1.5rem; border-radius:10px; border-left:4px solid #ffc107;">
+          <h4 style="color:#ffc107; margin-bottom:1rem;">⚠️ 實驗二：斷路測試</h4>
+          <p><strong>材料：</strong>電池、LED、開關</p>
+          <p><strong>目標：</strong>用開關控制燈泡</p>
+          <p><strong>重點：</strong>開關斷開即開路，LED 不亮</p>
+        </div>
+        <div style="background:#f8f9fa; padding:1.5rem; border-radius:10px; border-left:4px solid #17a2b8;">
+          <h4 style="color:#17a2b8; margin-bottom:1rem;">🔄 實驗三：串並聯對比</h4>
+          <p><strong>材料：</strong>電池、2 顆 LED、電阻、電線</p>
+          <p><strong>目標：</strong>比較亮度與容錯：串聯全滅、並聯單獨亮</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg,#4ECDC4,#44A08D); color:#fff; border-radius:15px; padding:2rem; margin:2rem 0;">
+      <h3 style="text-align:center; margin-bottom:2rem;">🏠 生活中的電路應用</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem;">
+        <div style="text-align:center;"><div style="font-size:3rem; margin-bottom:1rem;">🎄</div><h4>聖誕燈串</h4><p>早期串聯，一壞全暗；現在多並聯，更可靠。</p></div>
+        <div style="text-align:center;"><div style="font-size:3rem; margin-bottom:1rem;">🏠</div><h4>家裡的電燈</h4><p>並聯電路，個別控制，不互相影響。</p></div>
+        <div style="text-align:center;"><div style="font-size:3rem; margin-bottom:1rem;">🚗</div><h4>汽車電路</h4><p>燈具與模組多並聯，提高安全性與可維修性。</p></div>
+        <div style="text-align:center;"><div style="font-size:3rem; margin-bottom:1rem;">📱</div><h4>手機充電</h4><p>完整充電迴路與保護機制，確保安全。</p></div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="battery-power.html" class="nav-btn">⬅️ 上一課：電池的秘密</a>
+      <a href="short-circuit.html" class="nav-btn">下一課：危險的短路 ➡️</a>
+    </div>
+  </div>
+
+  <script>
+    // 互動狀態
+    let seriesOn = false;
+    let parallelOn = false;
+    let bulbBroken = false;
+
+    const sLamp1 = () => document.getElementById('sLamp1');
+    const sLamp2 = () => document.getElementById('sLamp2');
+    const pLamp1 = () => document.getElementById('pLamp1');
+    const pLamp2 = () => document.getElementById('pLamp2');
+
+    function setLamp(el, state){ // 'off' | 'dim' | 'on'
+      if(!el) return;
+      el.classList.remove('on','dim');
+      if(state==='on') el.classList.add('on');
+      else if(state==='dim') el.classList.add('dim');
+    }
+
+    function toggleSeries(){
+      seriesOn = !seriesOn;
+      const status = document.getElementById('seriesStatus');
+      if(seriesOn){
+        if(bulbBroken){
+          // 串聯：壞一顆即斷路 → 都不亮
+          setLamp(sLamp1(),'off'); setLamp(sLamp2(),'off');
+          status.textContent = '💡 串聯：有燈泡壞掉 → 迴路斷開 → 全部不亮';
+          status.style.color = '#c62828';
+        }else{
+          // 串聯：亮度較低（等效分壓）→ 用 dim 呈現
+          setLamp(sLamp1(),'dim'); setLamp(sLamp2(),'dim');
+          status.textContent = '🔆 串聯開啟：亮度較暗（電壓分配）';
+          status.style.color = '#2e7d32';
+        }
+      }else{
+        setLamp(sLamp1(),'off'); setLamp(sLamp2(),'off');
+        status.textContent = '⚫ 串聯關閉';
+        status.style.color = '#666';
+      }
+    }
+
+    function toggleParallel(){
+      parallelOn = !parallelOn;
+      const status = document.getElementById('parallelStatus');
+      if(parallelOn){
+        if(bulbBroken){
+          // 並聯：壞一顆，另一顆仍正常亮
+          setLamp(pLamp1(),'on'); setLamp(pLamp2(),'off');
+          status.textContent = '💡 並聯開啟：一顆壞掉，另一顆仍正常發亮';
+          status.style.color = '#FFC107';
+        }else{
+          setLamp(pLamp1(),'on'); setLamp(pLamp2(),'on');
+          status.textContent = '✨ 並聯開啟：兩顆都很亮（各自得到完整電壓）';
+          status.style.color = '#2e7d32';
+        }
+      }else{
+        setLamp(pLamp1(),'off'); setLamp(pLamp2(),'off');
+        status.textContent = '⚫ 並聯關閉';
+        status.style.color = '#666';
+      }
+    }
+
+    function breakBulb(){
+      bulbBroken = true;
+      const result = document.getElementById('demoResult');
+      result.textContent = '💥 啊！一個燈泡壞掉了。串聯會全滅；並聯其餘仍會亮。';
+      result.style.color = '#c62828';
+      // 立即反映在當前開啟的電路
+      if(seriesOn){ seriesOn = false; toggleSeries(); seriesOn = true; toggleSeries(); }
+      if(parallelOn){ parallelOn = false; toggleParallel(); parallelOn = true; toggleParallel(); }
+    }
+
+    function fixBulb(){
+      bulbBroken = false;
+      const result = document.getElementById('demoResult');
+      result.textContent = '🔧 燈泡修好了！恢復正常對比：串聯較暗、並聯很亮。';
+      result.style.color = '#2e7d32';
+      if(seriesOn){ seriesOn = false; toggleSeries(); seriesOn = true; toggleSeries(); }
+      if(parallelOn){ parallelOn = false; toggleParallel(); parallelOn = true; toggleParallel(); }
+    }
+  </script>
+</body>
+</html>

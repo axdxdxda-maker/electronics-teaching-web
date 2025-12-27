@@ -1,0 +1,28 @@
+📋 如何將您的Arduino Leonardo圖片添加到網站中
+
+🎯 步驟說明：
+
+1. 準備圖片
+   - 將您的Arduino Leonardo圖片另存為 JPG 格式
+   - 建議圖片大小：寬度1000-1500像素，保持清晰度
+   - 檔案命名：arduino-leonardo.jpg
+
+2. 放置圖片
+   - 將圖片檔案複製到：arduino/images/arduino-leonardo.jpg
+   - 確保檔案名稱完全一致（區分大小寫）
+
+3. 驗證顯示
+   - 重新載入 arduino/pin-theory.html 頁面
+   - 圖片應該會自動顯示
+   - 如果圖片過大，系統會自動縮放
+
+🔧 替代方案：
+如果圖片沒有顯示，您也可以：
+1. 使用其他圖片格式（.png 也可以）
+2. 修改檔案名稱為 arduino-leonardo.png
+3. 或直接聯繫管理員協助
+
+📝 注意事項：
+- 圖片檔案大小建議小於 2MB
+- 支援 JPG、PNG 格式
+- 圖片會保持原始比例自動縮放

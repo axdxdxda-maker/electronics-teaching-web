@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>麵包板 - 電子元件教學</title>
+  <style>
+    :root{
+      --primary:#007acc;
+      --secondary:#f0f8ff;
+      --success:#28a745;
+      --warning:#ffc107;
+      --danger:#dc3545;
+      --background:#ffffff;
+      --surface:#f8f9fa;
+      --text:#333333;
+      --border:#e9ecef;
+      --muted:#6b7280;
+      --hole:#9ca3af;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--background);color:var(--text);line-height:1.6}
+
+    .header{background:linear-gradient(135deg,var(--primary),#0056b3);color:white;padding:20px 0;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+    .header h1{font-size:2.5rem;font-weight:300;margin-bottom:8px}
+    .header p{font-size:1.2rem;opacity:0.9}
+
+    .nav{background:var(--surface);padding:10px 0;border-bottom:1px solid var(--border)}
+    .nav-content{max-width:1000px;margin:0 auto;padding:0 20px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:500;font-size:14px}
+    .nav a:hover{text-decoration:underline}
+
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+
+    .card{background:white;border-radius:12px;padding:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1);border:1px solid var(--border);margin-bottom:20px}
+    .card h3{color:var(--primary);margin-bottom:20px;font-size:1.4rem;font-weight:600;text-align:center}
+    .note{font-size:14px;color:#666}
+
+    /* Breadboard layout */
+    .board-container{display:flex;align-items:center;gap:20px;max-width:600px;margin:14px auto 0;justify-content:center}
+    .board{background:#f0f0f0;border:2px solid #ccc;border-radius:8px;padding:20px;display:grid;gap:16px;width:400px}
+    
+    .labels{display:grid;gap:16px;align-self:stretch;justify-content:start;margin-top:20px}
+    .label-item{font-size:12px;color:var(--muted);font-weight:600;text-align:center;white-space:nowrap;display:flex;align-items:center;height:40px}
+    .label-item.top{height:40px}
+    .label-item.mid-upper{height:80px}
+    .label-item.mid-lower{height:80px}
+    .label-item.bottom{height:40px}
+    .label-separator{height:3px}
+    
+    .rail-section{display:grid;gap:4px}
+    .rails{display:grid;grid-template-columns:repeat(10, 1fr);gap:3px;justify-content:center}
+    
+    .separator{height:3px;background:#333;margin:8px 0;border-radius:2px}
+    
+    .mid-section{display:grid;gap:16px}
+    .mid-block{display:grid;grid-template-columns:repeat(10, 1fr);gap:3px;grid-template-rows:repeat(5, 1fr);justify-content:center}
+    
+    .hole{width:14px;height:14px;border-radius:50%;background:#999;border:1px solid #777;cursor:pointer;transition:all .15s ease}
+    .hole:hover{transform:scale(1.15);background:#777}
+    .hole.active{background:#f59e0b;border-color:#e67e22;box-shadow:0 0 8px rgba(245,158,11,.6)}
+    
+    .rail-label{font-size:11px;color:var(--muted);text-align:center;margin:2px 0;font-weight:600}
+    .legend{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+
+    @media (max-width: 768px) {
+      .header h1{font-size:2rem}
+      .board-container{flex-direction:column;max-width:100%}
+      .board{width:100%;max-width:350px}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>麵包板 🔳</h1>
+    <p>電路的拼圖板 - 不用焊接就能搭電路！</p>
+  </div>
+
+  <div class="nav">
+    <div class="nav-content">
+      <a href="../index.html">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="note">說明：上方與下方各兩排為電源軌，<strong>同一橫排</strong>相通；中間區有上下兩塊，每塊中<strong>同一縱列的 5 個洞</strong>相通。點擊任一洞，會高亮顯示與其連通的洞。</div>
+
+      <div class="board-container">
+        <div class="labels">
+          <div class="label-item top">上方<br>（導線）</div>
+          <div class="label-separator"></div>
+          <div class="label-item mid-upper">中間<br>（導線）</div>
+          <div class="label-separator"></div>
+          <div class="label-item mid-lower">中間<br>（導線）</div>
+          <div class="label-separator"></div>
+          <div class="label-item bottom">下方<br>（導線）</div>
+        </div>
+
+        <div class="board" id="breadboard">
+          <!-- 上方電源軌 -->
+          <div class="rail-section">
+            <div class="rail-label">+</div>
+            <div class="rails" id="railTopA"></div>
+            <div class="rail-label">-</div>
+            <div class="rails" id="railTopB"></div>
+          </div>
+
+          <!-- 分隔線 -->
+          <div class="separator"></div>
+
+          <!-- 中間區域 -->
+          <div class="mid-section">
+            <div class="mid-block" id="midUpper"></div>
+            <div class="mid-block" id="midLower"></div>
+          </div>
+
+          <!-- 分隔線 -->
+          <div class="separator"></div>
+
+          <!-- 下方電源軌 -->
+          <div class="rail-section">
+            <div class="rail-label">+</div>
+            <div class="rails" id="railBotA"></div>
+            <div class="rail-label">-</div>
+            <div class="rails" id="railBotB"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">點擊任一洞，高亮顯示相通的洞位</div>
+    </div>
+  </div>
+
+  <script>
+    // Build breadboard structure
+    (function(){
+      const COLS = 10; // 橫向 10 孔
+      const railIds = ['railTopA','railTopB','railBotA','railBotB'];
+      const rails = railIds.map(id => document.getElementById(id));
+      const midUpper = document.getElementById('midUpper');
+      const midLower = document.getElementById('midLower');
+
+      function makeHole(parent, groupId){
+        const h = document.createElement('div');
+        h.className = 'hole';
+        h.dataset.group = groupId; // 相通群組
+        parent.appendChild(h);
+        return h;
+      }
+
+      // 電源軌：同一 rail 內的所有洞都相通
+      rails.forEach((rail, railIndex) => {
+        const groupId = `rail-${railIndex}`;
+        for(let i = 0; i < COLS; i++){
+          makeHole(rail, groupId);
+        }
+      });
+
+      function buildMidBlock(container, prefix){
+        // 創建 5行 x 10列 的grid，按行填充
+        const holes = [];
+        
+        // 先創建所有洞位，按grid順序（行優先）
+        for(let row = 0; row < 5; row++){
+          for(let col = 0; col < COLS; col++){
+            const hole = makeHole(container, ''); // 暫時不設group
+            holes.push({hole, row, col});
+          }
+        }
+        
+        // 然後按縱列設置group（同一列的洞相通）
+        for(let col = 0; col < COLS; col++){
+          const groupId = `${prefix}-col-${col}`;
+          holes.filter(h => h.col === col).forEach(h => {
+            h.hole.dataset.group = groupId;
+          });
+        }
+      }
+
+      buildMidBlock(midUpper, 'upper');
+      buildMidBlock(midLower, 'lower');
+
+      const board = document.getElementById('breadboard');
+      function clearActive(){ board.querySelectorAll('.hole.active').forEach(h=>h.classList.remove('active')); }
+      
+      let currentActiveGroup = null; // 記錄當前高亮的群組
+      
+      board.addEventListener('click', (e)=>{
+        if(e.target.classList.contains('hole')){
+          const group = e.target.dataset.group;
+          
+          // 如果點擊的是已經高亮的群組，則熄滅
+          if(currentActiveGroup === group){
+            clearActive();
+            currentActiveGroup = null;
+          } else {
+            // 否則高亮新的群組
+            clearActive();
+            board.querySelectorAll(`.hole[data-group="${group}"]`).forEach(h=>h.classList.add('active'));
+            currentActiveGroup = group;
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
